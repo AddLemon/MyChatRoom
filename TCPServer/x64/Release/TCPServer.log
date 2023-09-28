@@ -1,0 +1,107 @@
+﻿  main.cpp
+  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
+  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
+  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
+  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
+  public.cpp
+  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
+  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
+  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
+  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): error C2665: “boost::asio::const_buffer::const_buffer”: 没有重载函数可以转换所有参数类型
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\buffer.hpp(302,1): message : 可能是“boost::asio::const_buffer::const_buffer(boost::asio::const_buffer &&)”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): message : “boost::asio::const_buffer::const_buffer(boost::asio::const_buffer &&)”: 无法将参数 1 从“const char”转换为“boost::asio::const_buffer &&”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 原因如下: 无法从“const char”转换为“boost::asio::const_buffer”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\buffer.hpp(302,1): message : 或    “boost::asio::const_buffer::const_buffer(const boost::asio::const_buffer &)”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): message : “boost::asio::const_buffer::const_buffer(const boost::asio::const_buffer &)”: 无法将参数 1 从“const char”转换为“const boost::asio::const_buffer &”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 原因如下: 无法从“const char”转换为“const boost::asio::const_buffer”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\buffer.hpp(246,3): message : 或    “boost::asio::const_buffer::const_buffer(const boost::asio::mutable_buffer &) noexcept”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): message : “boost::asio::const_buffer::const_buffer(const boost::asio::mutable_buffer &) noexcept”: 无法将参数 1 从“const char”转换为“const boost::asio::mutable_buffer &”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 原因如下: 无法从“const char”转换为“const boost::asio::mutable_buffer”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : “boost::asio::mutable_buffer::mutable_buffer”: 没有重载函数可以转换所有参数类型
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\buffer.hpp(158,1): message : 可能是“boost::asio::mutable_buffer::mutable_buffer(boost::asio::mutable_buffer &&)”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : “boost::asio::mutable_buffer::mutable_buffer(boost::asio::mutable_buffer &&)”: 无法将参数 1 从“const char”转换为“boost::asio::mutable_buffer &&”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 原因如下: 无法从“const char”转换为“boost::asio::mutable_buffer”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 转换要求第二个用户定义的转换运算符或构造函数
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\buffer.hpp(158,1): message : 或    “boost::asio::mutable_buffer::mutable_buffer(const boost::asio::mutable_buffer &)”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : “boost::asio::mutable_buffer::mutable_buffer(const boost::asio::mutable_buffer &)”: 无法将参数 1 从“const char”转换为“const boost::asio::mutable_buffer &”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 原因如下: 无法从“const char”转换为“const boost::asio::mutable_buffer”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 转换要求第二个用户定义的转换运算符或构造函数
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 尝试匹配参数列表“(const char)”时
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): message : 尝试匹配参数列表“(const char)”时
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(115,30): message : 查看对正在编译的函数 模板 实例化“void boost::asio::detail::buffer_sequence_adapter<boost::asio::const_buffer,ConstBufferSequence>::init<std::_Vector_const_iterator<std::_Vector_val<std::_Simple_types<_Elem>>>>(Iterator,Iterator)”的引用
+          with
+          [
+              ConstBufferSequence=std::vector<char,std::allocator<char>>,
+              _Elem=char,
+              Iterator=std::_Vector_const_iterator<std::_Vector_val<std::_Simple_types<char>>>
+          ]
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(112,3): message : 在编译 类 模板 成员函数“boost::asio::detail::buffer_sequence_adapter<boost::asio::const_buffer,ConstBufferSequence>::buffer_sequence_adapter(const Buffers &)”时
+          with
+          [
+              ConstBufferSequence=std::vector<char,std::allocator<char>>,
+              Buffers=std::vector<char,std::allocator<char>>
+          ]
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\win_iocp_socket_service_base.hpp(279,34): message : 请参阅 "boost::asio::detail::win_iocp_socket_service_base::send" 中对 "boost::asio::detail::buffer_sequence_adapter<boost::asio::const_buffer,ConstBufferSequence>::buffer_sequence_adapter" 的第一个引用
+          with
+          [
+              ConstBufferSequence=std::vector<char,std::allocator<char>>
+          ]
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\win_iocp_socket_service_base.hpp(279,30): message : 查看对正在编译的 类 模板 实例化“boost::asio::detail::buffer_sequence_adapter<boost::asio::const_buffer,ConstBufferSequence>”的引用
+          with
+          [
+              ConstBufferSequence=std::vector<char,std::allocator<char>>
+          ]
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\basic_stream_socket.hpp(374,46): message : 查看对正在编译的函数 模板 实例化“size_t boost::asio::detail::win_iocp_socket_service_base::send<ConstBufferSequence>(boost::asio::detail::win_iocp_socket_service_base::base_implementation_type &,const ConstBufferSequence &,boost::asio::socket_base::message_flags,boost::system::error_code &)”的引用
+          with
+          [
+              ConstBufferSequence=std::vector<char,std::allocator<char>>
+          ]
+D:\MyWork_CPP\MyChatRoom\TCPServer\public.cpp(36,10): message : 查看对正在编译的函数 模板 实例化“size_t boost::asio::basic_stream_socket<boost::asio::ip::tcp,boost::asio::any_io_executor>::send<std::vector<char,std::allocator<char>>>(const ConstBufferSequence &)”的引用
+          with
+          [
+              ConstBufferSequence=std::vector<char,std::allocator<char>>
+          ]
+D:\MyWork_CPP\MyChatRoom\TCPServer\public.cpp(36,16): message : 请参阅 "sendMsg" 中对 "boost::asio::basic_stream_socket<boost::asio::ip::tcp,boost::asio::any_io_executor>::send" 的第一个引用
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): error C2665: “boost::asio::mutable_buffer::mutable_buffer”: 没有重载函数可以转换所有参数类型
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\buffer.hpp(158,1): message : 可能是“boost::asio::mutable_buffer::mutable_buffer(boost::asio::mutable_buffer &&)”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): message : “boost::asio::mutable_buffer::mutable_buffer(boost::asio::mutable_buffer &&)”: 无法将参数 1 从“const char”转换为“boost::asio::mutable_buffer &&”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 原因如下: 无法从“const char”转换为“boost::asio::mutable_buffer”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\buffer.hpp(158,1): message : 或    “boost::asio::mutable_buffer::mutable_buffer(const boost::asio::mutable_buffer &)”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): message : “boost::asio::mutable_buffer::mutable_buffer(const boost::asio::mutable_buffer &)”: 无法将参数 1 从“const char”转换为“const boost::asio::mutable_buffer &”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,21): message : 原因如下: 无法从“const char”转换为“const boost::asio::mutable_buffer”
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(183,20): message : 尝试匹配参数列表“(const char)”时
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(115,30): message : 查看对正在编译的函数 模板 实例化“void boost::asio::detail::buffer_sequence_adapter<boost::asio::mutable_buffer,MutableBufferSequence>::init<std::_Vector_const_iterator<std::_Vector_val<std::_Simple_types<_Elem>>>>(Iterator,Iterator)”的引用
+          with
+          [
+              MutableBufferSequence=std::vector<char,std::allocator<char>>,
+              _Elem=char,
+              Iterator=std::_Vector_const_iterator<std::_Vector_val<std::_Simple_types<char>>>
+          ]
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\buffer_sequence_adapter.hpp(112,3): message : 在编译 类 模板 成员函数“boost::asio::detail::buffer_sequence_adapter<boost::asio::mutable_buffer,MutableBufferSequence>::buffer_sequence_adapter(const Buffers &)”时
+          with
+          [
+              MutableBufferSequence=std::vector<char,std::allocator<char>>,
+              Buffers=std::vector<char,std::allocator<char>>
+          ]
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\win_iocp_socket_service_base.hpp(354,36): message : 请参阅 "boost::asio::detail::win_iocp_socket_service_base::receive" 中对 "boost::asio::detail::buffer_sequence_adapter<boost::asio::mutable_buffer,MutableBufferSequence>::buffer_sequence_adapter" 的第一个引用
+          with
+          [
+              MutableBufferSequence=std::vector<char,std::allocator<char>>
+          ]
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\detail\win_iocp_socket_service_base.hpp(354,32): message : 查看对正在编译的 类 模板 实例化“boost::asio::detail::buffer_sequence_adapter<boost::asio::mutable_buffer,MutableBufferSequence>”的引用
+          with
+          [
+              MutableBufferSequence=std::vector<char,std::allocator<char>>
+          ]
+C:\Users\Yuhao\vcpkg\installed\x64-windows\include\boost\asio\basic_stream_socket.hpp(621,46): message : 查看对正在编译的函数 模板 实例化“size_t boost::asio::detail::win_iocp_socket_service_base::receive<MutableBufferSequence>(boost::asio::detail::win_iocp_socket_service_base::base_implementation_type &,const MutableBufferSequence &,boost::asio::socket_base::message_flags,boost::system::error_code &)”的引用
+          with
+          [
+              MutableBufferSequence=std::vector<char,std::allocator<char>>
+          ]
+D:\MyWork_CPP\MyChatRoom\TCPServer\public.cpp(17,10): message : 查看对正在编译的函数 模板 实例化“size_t boost::asio::basic_stream_socket<boost::asio::ip::tcp,boost::asio::any_io_executor>::receive<std::vector<char,std::allocator<char>>>(const MutableBufferSequence &)”的引用
+          with
+          [
+              MutableBufferSequence=std::vector<char,std::allocator<char>>
+          ]
+D:\MyWork_CPP\MyChatRoom\TCPServer\public.cpp(17,19): message : 请参阅 "recvMsg" 中对 "boost::asio::basic_stream_socket<boost::asio::ip::tcp,boost::asio::any_io_executor>::receive" 的第一个引用
