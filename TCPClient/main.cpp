@@ -1,9 +1,6 @@
 #include <iostream>
 #include <map>
-#include <string>
-#include <vector>
 #include <thread>
-#include <boost/asio.hpp>
 #include "public.h"
 using namespace asio;
 
@@ -12,26 +9,33 @@ int main()
 	io_context io;
 	SockPtr sockPtr(new tcp::socket(io));
 
-	string ipAddr, userName;
-	vector<char> msg_name;
-	cout << "Please enter the server`s IP address:";
-	cin >> ipAddr;
-	cout << "Please enter your name:";
-	cin >> userName;
+	string ipAddr, msg_name;
 
-	msg_name.resize(userName.size());
-	msg_name.assign(userName.begin(), userName.end());
+	cout << "Please enter your name:";
+	getline(cin, msg_name);
+
+	//cout << "Please enter the server`s IP address:";
+	//cin >> ipAddr;
+
+	try {
+		sockPtr->connect(tcp::endpoint(ip::address::from_string("127.0.0.1"), 5000));
+	}
+	catch (std::exception& e) {
+		cerr << e.what() << endl;
+		return false;
+	}
 
 	sendMsg(sockPtr, msg_name);
 
 	while (1) {
-		char a[50];
+		string a, remsg;
 		cout << "you: ";
-		cin.get(a, 50);
-		vector<char> msg(a, a + strlen(a));
-		sendMsg(sockPtr, msg);
-	}
+		getline(cin, a);
 
+		sendMsg(sockPtr, a);
+		recvMsg(sockPtr, remsg);
+		cout << "server: " << remsg << endl;
+	}
 
 	return 0;
 }

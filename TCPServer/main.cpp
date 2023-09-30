@@ -1,16 +1,11 @@
 #include <iostream>
 #include <map>
-#include <vector>
 #include <thread>
-#include <boost/asio.hpp>
 #include "public.h"
-using namespace std;
-using namespace boost;
-using asio::ip::tcp;
 
 map<SockPtr, string> cliMap;
 
-int main() 
+int main()
 {
 	cout << "Server start..." << endl;
 	asio::io_context io;
@@ -20,12 +15,13 @@ int main()
 		/* Loop creating sockets and waiting for new clients to connect */
 		SockPtr sockPtr(new tcp::socket(io));
 		acceptor.accept(*sockPtr);
-		cout << "Client " << sockPtr->remote_endpoint().address() << "connected!" << endl;
+		cout << "Client " << sockPtr->remote_endpoint().address() << " connected!" << endl;
 
 		/* receive the name of the client and record */
-		vector<char> msg_name;
-		if (!recvMsg(sockPtr, msg_name)) continue;
-		cliMap[sockPtr] = msg_name.data();		//record socket pointer with client name in the map
+		string msg;
+		string& msg_name = msg;
+		if (!recvMsg(sockPtr, msg)) continue;
+		cliMap[sockPtr] = msg;	//record socket pointer with client name in the map
 #ifdef _WIN32
 		cout << "Client: " << U8toA(cliMap[sockPtr]) << " is online!" << endl;
 #else
@@ -36,7 +32,7 @@ int main()
 		thread dealCliThread(dealClient, sockPtr);
 		dealCliThread.detach();
 	}
-	
+
 	acceptor.close();
 	return 0;
 }

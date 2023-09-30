@@ -3,21 +3,20 @@
 void dealClient(SockPtr sockPtr)
 {
 	while (1) {
-		vector<char> msg;
+		string msg;
 		recvMsg(sockPtr, msg);
 		sendMsg(sockPtr, msg);
-
 	}
 }
 
-bool recvMsg(SockPtr sockPtr, vector<char>& msg)
+bool recvMsg(SockPtr sockPtr, string& msg)
 {
 	try {
-		vector<char> msg_tmp;
-		sockPtr->receive(msg_tmp);
+		string msg_tmp(50, '\0');
+		sockPtr->receive(asio::buffer(msg_tmp));
+		msg.assign(msg_tmp);
 		//TODO name check
-		
-		msg = msg_tmp;
+
 	}
 	catch (std::exception& e)
 	{
@@ -28,12 +27,12 @@ bool recvMsg(SockPtr sockPtr, vector<char>& msg)
 	return true;
 }
 
-bool sendMsg(SockPtr sockPtr, vector<char>& msg)
+bool sendMsg(SockPtr sockPtr, const string& msg)
 {
 	//TODO message checksum
 
 	try {
-		sockPtr->send(msg);
+		sockPtr->send(asio::buffer(msg));
 	}
 	catch (std::exception& e) {
 		cerr << e.what() << endl;
