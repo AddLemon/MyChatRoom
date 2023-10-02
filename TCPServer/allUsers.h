@@ -43,5 +43,13 @@ public:
 	/// <param name="user">user infomation</param>
 	/// <returns>true for success, otherwise false</returns>
 	bool Modify(User user);
+
+	/// <summary>
+	/// check if id and password correct
+	/// </summary>
+	/// <param name="id">user id</param>
+	/// <param name="password">user password</param>
+	/// <returns>if correct, return user info. Else return a struct with no data</returns>
+	User Check(char* id, char* password);
 };
 

@@ -24,12 +24,30 @@
     <ClCompile Include="packet.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="onlineUsers.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="allUsers.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="myfile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="public.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="packet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="onlineUsers.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="allUsers.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="myfile.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

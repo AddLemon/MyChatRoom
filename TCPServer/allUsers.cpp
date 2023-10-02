@@ -96,3 +96,21 @@ bool AllUsers::Modify(User user)
 	}
 	return true;
 }
+
+User AllUsers::Check(char* id, char* password)
+{
+	User user_output = {};
+	try {
+		//traverse the container to check id and password
+		for (vector<User>::iterator i = this->allUsers.begin(); i != allUsers.end(); ++i) {
+			if (strcmp((*i).id, id) && strcmp((*i).password, password)) {
+				user_output = *i;
+			}
+			else continue;
+		}
+	}
+	catch (std::exception& e) {
+		cerr << e.what() << endl;
+	}
+	return user_output;
+}
