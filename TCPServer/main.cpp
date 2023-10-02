@@ -1,9 +1,7 @@
 #include <iostream>
-#include <map>
 #include <thread>
 #include "public.h"
-
-map<SockPtr, string> cliMap;
+#include "packet.h"
 
 int main()
 {

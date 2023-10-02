@@ -1,47 +1,16 @@
 #include "public.h"
 
-void dealClient(SockPtr sockPtr)
+map<SockPtr, string> cliMap;
+
+void DealClient(SockPtr sockPtr)
 {
 	while (1) {
 		string msg;
-		recvMsg(sockPtr, msg);
-		sendMsg(sockPtr, msg);
+
+		RecvMsg(sockPtr, msg);
+		SendMsg(sockPtr, msg);
 	}
 }
-
-bool recvMsg(SockPtr sockPtr, string& msg)
-{
-	try {
-		string msg_tmp(50, '\0');
-		sockPtr->receive(asio::buffer(msg_tmp));
-		msg.assign(msg_tmp);
-		//TODO name check
-
-	}
-	catch (std::exception& e)
-	{
-		cerr << e.what() << endl;
-		return false;
-	}
-
-	return true;
-}
-
-bool sendMsg(SockPtr sockPtr, const string& msg)
-{
-	//TODO message checksum
-
-	try {
-		sockPtr->send(asio::buffer(msg));
-	}
-	catch (std::exception& e) {
-		cerr << e.what() << endl;
-		return false;
-	}
-
-	return true;
-}
-
 
 #ifdef _WIN32
 //UTF-8×ªÕ­×Ö·û´®
