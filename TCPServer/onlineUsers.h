@@ -1,6 +1,5 @@
 #pragma once
 #include "public.h"
-#include "user.h"
 
 class OnlineUsers
 {

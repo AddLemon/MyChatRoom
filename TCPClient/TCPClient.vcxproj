@@ -127,12 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\TCPServer\user.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="public.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\TCPServer\user.h" />
     <ClInclude Include="public.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
