@@ -9,7 +9,7 @@ using asio::ip::tcp;
 
 #define USER_ID_LENGTH 16
 #define NAME_LENGTH 16
-#define PASSWORD_LENGTH
+#define PASSWORD_LENGTH 16
 #define MESSAGE_LENGTH 256
 
 typedef std::shared_ptr<tcp::socket> SockPtr;

@@ -1,13 +1,22 @@
 #include "packet.h"
 
-bool Packet::RecvMsg(SockPtr sockPtr, string& msg)
+bool Packet::RecvMsg(const SockPtr sockP, string& msg, MsgType& type)
 {
+	Header header;
+	string msg_tmp(50, '\0');
 	try {
-		string msg_tmp(50, '\0');
-		sockPtr->receive(asio::buffer(msg_tmp));
-		msg.assign(msg_tmp);
-		//TODO name check
+		sockP->receive(asio::buffer(header));
+		sockP->receive(asio::buffer(msg_tmp)); // TODO try msg.data();
 
+		// check message checksum
+		char sum = 0;
+		for (auto i : msg_tmp) {
+			sum += i;
+		}
+		if (header.checkSum != sum) return false;
+		msg.resize(header.len);
+		msg.assign(msg_tmp);
+		type = header.type;
 	}
 	catch (std::exception& e)
 	{
@@ -18,12 +27,19 @@ bool Packet::RecvMsg(SockPtr sockPtr, string& msg)
 	return true;
 }
 
-bool Packet::SendMsg(SockPtr sockPtr, const string& msg)
+bool Packet::SendMsg(const SockPtr sockP, const string& msg, const MsgType type)
 {
-	//TODO message checksum
+	Header header;
+	// message checksum
+	for (auto i : msg) {
+		header.checkSum += i;
+	}
+	header.type = type;
+	header.len = msg.size();
 
 	try {
-		sockPtr->send(asio::buffer(msg));
+		sockP->send(asio::buffer(header));
+		sockP->send(asio::buffer(msg));
 	}
 	catch (std::exception& e) {
 		cerr << e.what() << endl;
