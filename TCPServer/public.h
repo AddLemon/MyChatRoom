@@ -16,16 +16,51 @@ typedef std::shared_ptr<tcp::socket> SockPtr;
 
 extern map<SockPtr, string> cliMap;
 
+enum MsgType {
+	serverMsg = 0,
+	serverSignal = 1,
+	logIn = 2,
+	newAccount = 3,
+	chat = 4,
+	settings = 5,
+	logOff = 6,
+};
+
+enum Result {
+	success = 0,
+
+	/* log in check */
+	idNotExit = 1,
+	passwordNotCorrect = 2,
+
+	/* find result */
+	notOnline = 3,
+	receiverNotOnline = 4,
+
+	/* register check */
+	duplicateID = 5,
+
+	/* chat check */
+	receiverNotExit = 6,
+};
+
+/// <summary>
+/// describe the meaning of return value
+/// </summary>
+/// <param name="result">result value</param>
+/// <returns></returns>
+string DescribeReturn(Result result);
+
 struct User {
-	char id[USER_ID_LENGTH];
-	char name[NAME_LENGTH];
-	char password[PASSWORD_LENGTH];
+	string id;
+	string name;
+	string password;
 
 	//operator overloading for find function to compare two User struct
 	bool operator==(const User& other) const {
-		return (string(this->id) == string(other.id) &&
-			string(this->name) == string(other.name) &&
-			string(this->password) == string(other.password));
+		return ((this->id == other.id) &&
+			(this->name == other.name) &&
+			(this->password == other.password));
 	}
 };
 

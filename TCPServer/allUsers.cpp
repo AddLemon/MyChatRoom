@@ -97,14 +97,18 @@ bool AllUsers::Modify(User user)
 	return true;
 }
 
-User AllUsers::Check(char* id, char* password)
+Result AllUsers::CheckCorrect(const string& id, const string& password, User& user)
 {
-	User user_output = {};
+	Result result = idNotExit;
 	try {
 		//traverse the container to check id and password
 		for (vector<User>::iterator i = this->allUsers.begin(); i != allUsers.end(); ++i) {
-			if (strcmp((*i).id, id) && strcmp((*i).password, password)) {
-				user_output = *i;
+			if (string((*i).id) == id) {
+				if (string((*i).password) == password) {
+					user = *i;
+					result = success;
+				}
+				else result = passwordNotCorrect;
 			}
 			else continue;
 		}
@@ -112,5 +116,17 @@ User AllUsers::Check(char* id, char* password)
 	catch (std::exception& e) {
 		cerr << e.what() << endl;
 	}
-	return user_output;
+	return result;
+}
+
+Result AllUsers::CheckExit(const string& id, const string& name, const string& password)
+{
+	// traverse to check if input id already exit
+	for (vector<User>::iterator i = allUsers.begin(); i != allUsers.end(); ++i) {
+		if ((*i).id == id) return duplicateID;
+	}
+	// insert into allUsers vector
+	User user = { id, name, password };
+	Insert(user);
+	return success;
 }

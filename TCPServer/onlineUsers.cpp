@@ -20,11 +20,11 @@ bool OnlineUsers::Insert(SockPtr sock, User user)
 	return true;
 }
 
-bool OnlineUsers::Remove(User user)
+bool OnlineUsers::Remove(SockPtr sock)
 {
 	try {
 		for (map< SockPtr, User>::iterator i = olUsers.begin(); i != olUsers.end(); ++i) {
-			if ((*i).second == user) {
+			if ((*i).first == sock) {
 				olUsers.erase(i);
 				break;
 			}
@@ -52,20 +52,32 @@ bool OnlineUsers::RenewInfo(SockPtr sock, User user)
 	return true;
 }
 
-User OnlineUsers::FindUser(SockPtr sock)
+bool OnlineUsers::FindUser(const SockPtr sock, User& user)
 {
+	if (olUsers.empty()) return false;
 	map< SockPtr, User>::iterator pos = olUsers.find(sock);
-	if (pos == olUsers.end()) return {};
-	return (*pos).second;
+	if (pos == olUsers.end()) return false;
+	user = (*pos).second;
+	return true;
 }
 
-SockPtr OnlineUsers::FindSocket(const char* id)
+bool OnlineUsers::FindUser(const SockPtr sock)
 {
+	if (olUsers.empty()) return false;
+	map< SockPtr, User>::iterator pos = olUsers.find(sock);
+	if (pos == olUsers.end()) return false;
+	return true;
+}
+
+bool OnlineUsers::FindSocket(const string& id, SockPtr sock)
+{
+	if (olUsers.empty()) return false;
 	for (map< SockPtr, User>::iterator i = olUsers.begin(); i != olUsers.end(); ++i) {
-		if (strcmp((*i).second.id, id)) {
-			return (*i).first;
+		if (id == string((*i).second.id)) {
+			sock = (*i).first;
+			return true;
 		}
 	}
-	return NULL;
+	return false;
 }
 

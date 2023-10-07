@@ -49,7 +49,16 @@ public:
 	/// </summary>
 	/// <param name="id">user id</param>
 	/// <param name="password">user password</param>
-	/// <returns>if correct, return user info. Else return a struct with no data</returns>
-	User Check(char* id, char* password);
+	/// <param name="user">user infomation</param>
+	/// <returns>return enum result number</returns>
+	Result CheckCorrect(const string& id, const string& password, User& user);
+
+	/// <summary>
+	/// check if the id already exit, if not exit, user` info will be recorded
+	/// <param name="id">new user id</param>
+	/// <param name="name">new user name</param>
+	/// <param name="password">new user password</param>
+	/// <returns>return enum result number</returns>
+	Result CheckExit(const string& id, const string& name, const string& password);
 };
 
