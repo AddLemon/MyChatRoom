@@ -1,0 +1,1 @@
+D:\MyWork_CPP\MyChatRoom\TCPClient\x64\Release\TCPClient.vcxproj.CopyComplete

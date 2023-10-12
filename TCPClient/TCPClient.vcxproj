@@ -127,10 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cliFunction.cpp" />
+    <ClCompile Include="cliPacket.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="public.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cliFunction.h" />
+    <ClInclude Include="cliPacket.h" />
     <ClInclude Include="public.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

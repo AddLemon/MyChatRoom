@@ -130,7 +130,6 @@
     <ClCompile Include="allUsers.cpp" />
     <ClCompile Include="Function.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="myfile.cpp" />
     <ClCompile Include="onlineUsers.cpp" />
     <ClCompile Include="packet.cpp" />
     <ClCompile Include="public.cpp" />
@@ -138,7 +137,6 @@
   <ItemGroup>
     <ClInclude Include="allUsers.h" />
     <ClInclude Include="Function.h" />
-    <ClInclude Include="myfile.h" />
     <ClInclude Include="onlineUsers.h" />
     <ClInclude Include="packet.h" />
     <ClInclude Include="public.h" />

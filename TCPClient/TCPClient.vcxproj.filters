@@ -21,9 +21,21 @@
     <ClCompile Include="public.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="cliPacket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cliFunction.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="public.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cliPacket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="cliFunction.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include "json/json.h"
 #include "public.h"
-#include "myfile.h"
 
 class AllUsers
 {
@@ -55,6 +57,7 @@ public:
 
 	/// <summary>
 	/// check if the id already exit, if not exit, user` info will be recorded
+	/// </summary>
 	/// <param name="id">new user id</param>
 	/// <param name="name">new user name</param>
 	/// <param name="password">new user password</param>

@@ -2,52 +2,74 @@
 
 AllUsers::AllUsers()
 {
-	this->Load();
+	Load();
 	cout << "All users information loaded!" << endl;
 }
 
 AllUsers::~AllUsers()
 {
-	this->Save();
+	Save();
 	cout << "All users information saved and closed!" << endl;
 }
 
 bool AllUsers::Load()
 {
-	try {
-		MyFile fileUser;
-		User user_empty{};
-		fileUser.Open("UserInfo.txt", "a+");
+	//open file to get data
+	ifstream in;
+	in.open("..\\..\\data\\allUsersInfo.json", ios::in | ios::binary);
 
-		for (int i = 0; !fileUser.Feof(); i++) {
-			this->allUsers.push_back(user_empty);					//extend new space for more data
-			fileUser.Read(&this->allUsers[i], sizeof(User));		//read data from file to buffer
-		}
-		fileUser.Close();
-	}
-	catch (std::exception& e){
-		cerr << e.what() << endl;
+	if (!in.is_open())
+	{
+		cout << "Error opening file" << endl;	//return signal
 		return false;
 	}
-	
+
+	//parse to json
+	Json::Value allUsers_json;
+	Json::Reader reader;
+
+	if (reader.parse(in, allUsers_json))
+	{
+		//read every user info from json to vector
+		for (unsigned int i = 0; i < allUsers_json.size(); i++) {
+			User user{};
+			user.id = allUsers_json[i]["id"].asString();
+			user.name = allUsers_json[i]["name"].asString();
+			user.password = allUsers_json[i]["password"].asString();
+			allUsers.push_back(user);
+		}
+		//TODO return signal
+	}
+	else {
+		cout << "allUsers parse err" << endl;			//return signal
+	}
+
+	in.close();
 	return true;
 }
 
 bool AllUsers::Save()
 {
-	try {
-		MyFile fileUser;
-		fileUser.Open("UserInfo.txt", "w");
+	Json::Value allUsers_json;
+	Json::StyledWriter swriter;
 
-		for (int i = 0; i< this->allUsers.size(); i++) {
-			fileUser.Write(&this->allUsers[i], sizeof(User));		//write data from buffer to file
-		}
-		fileUser.Close();
+	//store vector to json
+	for (vector<User>::iterator i = allUsers.begin(); i != allUsers.end(); ++i) {
+		Json::Value user_json;
+		user_json["id"] = (*i).id;
+		user_json["name"] = (*i).name;
+		user_json["password"] = (*i).password;
+		allUsers_json.append(user_json);
 	}
-	catch (std::exception& e) {
-		cerr << e.what() << endl;
-		return false;
-	}
+
+	//open file
+	ofstream out;
+	out.open("..\\..\\data\\allUsersInfo.json", ios::binary|ios::out);
+
+	//write json to file
+	out << swriter.write(allUsers_json);
+	out.close();
+
 	return true;
 }
 
@@ -55,7 +77,7 @@ bool AllUsers::Insert(User user)
 {
 	try {
 		allUsers.push_back(user);
-		this->Save();
+		Save();
 	}
 	catch (std::exception& e) {
 		cerr << e.what() << endl;
@@ -69,7 +91,7 @@ bool AllUsers::Erase(User user)
 	try {
 		vector<User>::iterator pos = find(this->allUsers.begin(), this->allUsers.end(), user); //overloaded ==operator, so can compare two user struct
 		this->allUsers.erase(pos);
-		this->Save();
+		Save();
 	}
 	catch (std::exception& e) {
 		cerr << e.what() << endl;

@@ -6,21 +6,64 @@ using namespace std;
 using namespace boost;
 using asio::ip::tcp;
 
+#define USER_ID_LENGTH 16
+#define NAME_LENGTH 16
+#define PASSWORD_LENGTH 16
+#define MESSAGE_LENGTH 256
+
 typedef std::shared_ptr<tcp::socket> SockPtr;
 
-/// <summary>
-/// Receive message from client and save in the input container. Return true when successful, else return false.
-/// </summary>
-/// <param name="sockPtr">A pointer of the socket connected to current client</param>
-/// <param name="msg">A container for saving message</param>
-/// <returns>Return true when receive successfully, else return false.</returns>
-bool recvMsg(SockPtr sockPtr, string& msg);
+enum MsgType {
+	serverMsg = 0,
+	serverSignal = 1,
+	logIn = 2,
+	newAccount = 3,
+	chat = 4,
+	settings = 5,
+	logOff = 6,
+};
 
+typedef enum Result {
+	success = 0,
+
+	/* log in check */
+	idNotExit = 1,
+	passwordNotCorrect = 2,
+
+	/* find result */
+	notOnline = 3,
+	receiverNotOnline = 4,
+
+	/* register check */
+	duplicateID = 5,
+
+	/* chat check */
+	receiverNotExit = 6,
+} ServerSignal;
+
+struct User {
+	string id;
+	string name;
+	string password;
+
+	//operator overloading for find function to compare two User struct
+	bool operator==(const User& other) const {
+		return ((this->id == other.id) &&
+			(this->name == other.name) &&
+			(this->password == other.password));
+	}
+};
+
+void DealRecvMsg();
 
 /// <summary>
-///	Send message to the server. Return true when successful, else return false.
+/// describe the meaning of return value
 /// </summary>
-/// <param name="sockPtr">A pointer of the socket connected to server</param>
-/// <param name="msg">A container saving message</param>
-/// <returns>Return true when send successfully, else return false.</returns>
-bool sendMsg(SockPtr sockPtr, const string& msg);
+/// <param name="result">result value</param>
+/// <returns></returns>
+string DescribeServSignal(Result result);
+
+#ifdef _WIN32
+//UTF-8×ªÕ­×Ö·û´®
+string U8toA(const string& s);
+#endif

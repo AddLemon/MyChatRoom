@@ -48,6 +48,12 @@ public:
 	/// <param name="receiverID">the id of a user who will receive the message</param>
 	void PrivateChat(SockPtr sockPtr, const string& recvMsg, const string& receiverID);
 
-	void GetInstruction();
+	void GetInstruction(SockPtr sockPtr);
+
+	/// <summary>
+	/// Deal with client`s requirements in thread
+	/// </summary>
+	/// <param name="sockPtr">A pointer of the socket connected to current client</param>
+	void DealClient(SockPtr sockPtr);
 };
 

@@ -1,36 +1,5 @@
 #include "public.h"
 
-map<SockPtr, string> cliMap;
-
-string DescribeReturn(Result result)
-{
-	string str{};
-	switch (result) {
-	case idNotExit:
-		str = "ID is not exit, please try again.";
-		break;
-	case passwordNotCorrect:
-		str = "Password is not correct, please try again.";
-		break;
-	case notOnline:
-		str = "You are not online, please log in first.";
-		break;
-	
-	}
-
-	return str;
-}
-
-void DealClient(SockPtr sockPtr)
-{
-	while (1) {
-		string msg;
-
-		RecvMsg(sockPtr, msg);
-		SendMsg(sockPtr, msg);
-	}
-}
-
 #ifdef _WIN32
 //UTF-8×ªÕ­×Ö·û´®
 string U8toA(const string& s)

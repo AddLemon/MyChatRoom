@@ -2,6 +2,7 @@
 #include <map>
 #include <thread>
 #include "public.h"
+#include "CliFunction.h"
 using namespace asio;
 
 int main()
@@ -11,11 +12,14 @@ int main()
 
 	string ipAddr, msg_name;
 
-	cout << "Please enter your name:";
-	getline(cin, msg_name);
+	// cout << "Please enter your name:";
+	// getline(cin, msg_name);
 
 	//cout << "Please enter the server`s IP address:";
 	//cin >> ipAddr;
+
+	CliFunction func;
+	
 
 	try {
 		sockPtr->connect(tcp::endpoint(ip::address::from_string("127.0.0.1"), 5000));
@@ -25,17 +29,8 @@ int main()
 		return false;
 	}
 
-	sendMsg(sockPtr, msg_name);
-
-	while (1) {
-		string a, remsg;
-		cout << "you: ";
-		getline(cin, a);
-
-		sendMsg(sockPtr, a);
-		recvMsg(sockPtr, remsg);
-		cout << "server: " << remsg << endl;
-	}
+	func.Init(sockPtr);
+	func.InitialInterface();
 
 	return 0;
 }

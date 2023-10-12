@@ -30,9 +30,6 @@
     <ClCompile Include="allUsers.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="myfile.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Function.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -48,9 +45,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="allUsers.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="myfile.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Function.h">

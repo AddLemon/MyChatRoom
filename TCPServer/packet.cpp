@@ -2,23 +2,31 @@
 
 bool Packet::RecvMsg(const SockPtr sockPtr, string& msg, MsgType& type, string& receiverID)
 {
-	string sPacket(50, '/0');	//try ' '
+	//receive data and resize the buffer
+	string sPacket(300, ' ');	//try ' '
+	size_t size;
 	try {
-		sockPtr->receive(asio::buffer(sPacket)); // TODO try msg.data();
+		size = sockPtr->receive(asio::buffer(sPacket)); // TODO try msg.data();
 	}
 	catch (std::exception& e)
 	{
 		cerr << e.what() << endl;
 		return false;
 	}
+	sPacket.resize(size);
 
 	//parse string
 	Json::Reader reader;
 	Json::Value jPacket;
-	if (!reader.parse(sPacket.c_str(), jPacket)) {
+	if (!reader.parse(sPacket.data(), jPacket)) {
 		cout << "Fail: Failed to parse data." << endl;
 		return false;
 	}
+
+	Json::StyledWriter swriter;	//test ********************
+	cout << "Receive:" << endl;	//test
+	cout << swriter.write(jPacket) << endl;	//test
+	cout << endl;	//test
 
 	char checkSum = static_cast<char>(jPacket["header"]["checkSum"].asInt());		//type conversion
 	MsgType msgType = static_cast<MsgType>(jPacket["header"]["type"].asInt());
@@ -28,9 +36,10 @@ bool Packet::RecvMsg(const SockPtr sockPtr, string& msg, MsgType& type, string& 
 
 	// check message checksum
 	char sum = 0;
-	for (auto i : sPacket) {
+	for (auto i : message) {
 		sum += i;
 	}
+
 	if (checkSum != sum) {
 		cout << "Fail: Checksum is inconsistent." << endl;
 		return false;
@@ -60,11 +69,16 @@ bool Packet::SendMsg(const SockPtr sockPtr, const string& msg, const MsgType& ty
 	jPacket_first["length"] = msg.size();
 	jPacket_first["senderID"] = senderID;
 	jPacket["header"] = jPacket_first;
-	jPacket["message"] = msg.c_str();
+	jPacket["message"] = msg.data();
 
 	//json to string
 	Json::FastWriter writer;
 	string sPacket = writer.write(jPacket);
+
+	Json::StyledWriter swriter;		//test
+	cout << "send:" << endl;		//test
+	cout << swriter.write(jPacket) << endl;	//test
+	cout << endl;		//test
 
 	//send packet
 	try {
@@ -85,7 +99,7 @@ bool Packet::SendMsg(const SockPtr sockPtr, const string& msg, const MsgType& ty
 	for (auto i : msg) {
 		checkSum += i;
 	}
-
+	
 	//write json
 	Json::Value jPacket;
 	Json::Value jPacket_first;
@@ -94,11 +108,16 @@ bool Packet::SendMsg(const SockPtr sockPtr, const string& msg, const MsgType& ty
 	jPacket_first["length"] = msg.size();
 	jPacket_first["senderID"] = "";
 	jPacket["header"] = jPacket_first;
-	jPacket["message"] = msg.c_str();
+	jPacket["message"] = msg.data();
 
 	//json to string
 	Json::FastWriter writer;
 	string sPacket = writer.write(jPacket);
+
+	Json::StyledWriter swriter;		//test
+	cout << "send:" << endl;		//test
+	cout << swriter.write(jPacket) << endl;	//test
+	cout << endl;		//test
 
 	//send packet
 	try {

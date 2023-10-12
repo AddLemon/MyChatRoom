@@ -21,7 +21,7 @@ void Function::LogIn(SockPtr sockPtr, const string& recvMsg)
 	//parse msg
 	Json::Value jMsg;
 	Json::Reader reader;
-	reader.parse(recvMsg.c_str(), jMsg);
+	reader.parse(recvMsg.data(), jMsg);
 	const string id = jMsg["id"].asString();
 	const string pswd = jMsg["password"].asString();
 
@@ -39,6 +39,14 @@ void Function::LogIn(SockPtr sockPtr, const string& recvMsg)
 	}
 	//insert to olUsers map
 	olUsers.Insert(sockPtr, user);
+
+	if (result == Result::success) {
+#ifdef _WIN32
+		cout << "Client: " << U8toA(user.name) << " is online!" << endl;
+#else
+		cout << "Client: " << user.name << " is online!" << endl;
+#endif
+	}
 
 	//send signal to sender client
 	jMsg_send["serverSignal"] = result;
@@ -60,7 +68,7 @@ void Function::Register(SockPtr sockPtr, const string& recvMsg)
 	//parse msg
 	Json::Value jMsg;
 	Json::Reader reader;
-	reader.parse(recvMsg.c_str(), jMsg);
+	reader.parse(recvMsg.data(), jMsg);
 	const string id = jMsg["id"].asString();
 	const string name = jMsg["name"].asString();
 	const string pswd = jMsg["password"].asString();
@@ -68,7 +76,7 @@ void Function::Register(SockPtr sockPtr, const string& recvMsg)
 	//create send msg
 	Json::Value jMsg_send;
 	Json::FastWriter writer;
-	string sendMsg{};
+	string sMsg_reply{};
 
 	//check if already online
 	Result result{};
@@ -77,9 +85,9 @@ void Function::Register(SockPtr sockPtr, const string& recvMsg)
 		result = allUsers.CheckExit(id, name, pswd);	//check if id already exit
 	}
 	jMsg_send["serverSignal"] = result;
-	sendMsg = writer.write(jMsg_send);
+	sMsg_reply = writer.write(jMsg_send);
 
-	pkg.SendMsg(sockPtr, sendMsg, serverSignal);	//server reply		
+	pkg.SendMsg(sockPtr, sMsg_reply, serverSignal);	//server reply		
 }
 
 void Function::Settings(SockPtr sockPtr, const string& recvMsg)
@@ -87,7 +95,7 @@ void Function::Settings(SockPtr sockPtr, const string& recvMsg)
 	//parse msg
 	Json::Value jMsg;
 	Json::Reader reader;
-	reader.parse(recvMsg.c_str(), jMsg);
+	reader.parse(recvMsg.data(), jMsg);
 	const string id = jMsg["id"].asString();
 	const string name = jMsg["name"].asString();
 	const string pswd = jMsg["password"].asString();
@@ -158,11 +166,9 @@ void Function::PrivateChat(SockPtr sockPtr, const string& recvMsg, const string&
 	pkg.SendMsg(sockPtr, sendMsg_err, serverSignal);	//server reply	
 }
 
-void Function::GetInstruction()
+void Function::GetInstruction(SockPtr sockPtr)
 {
 	//connected, now have socket
-	asio::io_context io;
-	SockPtr sockPtr(new tcp::socket(io));
 	MsgType type{};
 	string recvMsg{};
 	string receiverID{};
@@ -171,23 +177,29 @@ void Function::GetInstruction()
 	pkg.RecvMsg(sockPtr, recvMsg, type, receiverID);	//receive msg
 
 	switch (type) {
-	case logIn: 
+	case logIn:
 		LogIn(sockPtr, recvMsg);
 		break;
 
-	case newAccount: 
+	case newAccount:
 		Register(sockPtr, recvMsg);
 		break;
 
-	case chat: 
+	case chat:
 		PrivateChat(sockPtr, recvMsg, receiverID);
 		break;
-	
-	case settings: 
+
+	case settings:
 		Settings(sockPtr, recvMsg);
 		break;
 
-	default:
-		//err
+	}
+}
+
+void Function::DealClient(SockPtr sockPtr)
+{
+	while (1) {
+		GetInstruction(sockPtr);
+
 	}
 }
