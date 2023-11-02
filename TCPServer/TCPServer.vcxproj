@@ -104,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,19 +128,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="allUsers.cpp" />
-    <ClCompile Include="Function.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="onlineUsers.cpp" />
-    <ClCompile Include="packet.cpp" />
-    <ClCompile Include="public.cpp" />
+    <ClCompile Include="Packet_Serv.cpp" />
+    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="Socket_Serv.cpp" />
+    <ClCompile Include="sqlite3.c" />
+    <ClCompile Include="SQLiteController.cpp" />
+    <ClCompile Include="TaskQueue.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="allUsers.h" />
-    <ClInclude Include="Function.h" />
-    <ClInclude Include="onlineUsers.h" />
-    <ClInclude Include="packet.h" />
-    <ClInclude Include="public.h" />
+    <ClInclude Include="Packet_Serv.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="Socket_Serv.h" />
+    <ClInclude Include="sqlite3.h" />
+    <ClInclude Include="SQLiteController.h" />
+    <ClInclude Include="TaskQueue.h" />
+    <ClInclude Include="ThreadPool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

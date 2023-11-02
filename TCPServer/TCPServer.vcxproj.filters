@@ -18,36 +18,48 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="public.cpp">
+    <ClCompile Include="Socket_Serv.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="packet.cpp">
+    <ClCompile Include="Packet_Serv.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="onlineUsers.cpp">
+    <ClCompile Include="Server.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="allUsers.cpp">
+    <ClCompile Include="SQLiteController.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Function.cpp">
+    <ClCompile Include="TaskQueue.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sqlite3.c">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="public.h">
+    <ClInclude Include="Socket_Serv.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="packet.h">
+    <ClInclude Include="Packet_Serv.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="onlineUsers.h">
+    <ClInclude Include="Server.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="allUsers.h">
+    <ClInclude Include="TaskQueue.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Function.h">
+    <ClInclude Include="ThreadPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLiteController.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite3.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

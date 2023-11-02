@@ -1,30 +1,38 @@
-#include <iostream>
-#include <thread>
-#include "public.h"
-#include "packet.h"
-#include "Function.h"
+#include "Packet_Serv.h"
+#include "Server.h"
+#include "SQLiteController.h"
+#include "ThreadPool.h"
 
 int main()
 {
-	cout << "Server start..." << endl;
-	asio::io_context io;
-	tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 5000));
+	/************************************************************************/
+	Server* server = Server::getInstance();
 
-	Function func;
+	string tmpID = to_string(124578);
+	MsgType type = REGISTER_UP;
+	Json::Value pkt;
+	pkt["header"]["requireID"] = 123456789;
+	pkt["header"]["type"] = REGISTER_UP;
+	pkt["header"]["senderID"] = "124578";
+	pkt["header"]["receiverID"];
+	pkt["header"]["groupID"];
+	pkt["message"]["userID"] = "123456";
+	pkt["message"]["userName"] = "Alex";
+	pkt["message"]["password"] = "alex123456";
 
-	while (1) {
-		/* Loop creating sockets and waiting for new clients to connect */
-		SockPtr sockPtr(new tcp::socket(io));
-		acceptor.accept(*sockPtr);
-		cout << "Client " << sockPtr->remote_endpoint().address() << " connected!" << endl;
 
-		
+	Json::Value msg = pkt["message"];	//接收到的信息，传入线程
 
-		/* Enter the thread after connecting */
-		thread dealCliThread(&Function::DealClient, &func, sockPtr);
-		dealCliThread.detach();
-	}
+	Json::StyledWriter styledWriter;
+	std::cout << styledWriter.write(pkt);
 
-	acceptor.close();
-	return 0;
+	auto func = [&]() {
+		Json::Value result = server->dispatchRequest(type, pkt);
+		std::cout << styledWriter.write(result);
+	};
+	Task task(func);
+
+	server->m_threadPool.addTask(&task);
+
+	this_thread::sleep_for(chrono::seconds(3));
 }
