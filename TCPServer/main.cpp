@@ -34,5 +34,5 @@ int main()
 
 	server->m_threadPool.addTask(&task);
 
-	this_thread::sleep_for(chrono::seconds(3));
+	this_thread::sleep_for(chrono::seconds(100));
 }
