@@ -37,7 +37,7 @@ bool SqliteController::insertUser(const string& userID, const string& userName, 
 	rc = sqlite3_step(stmt);
 	if (rc != SQLITE_DONE) {
 		sqlite3_finalize(stmt);
-		cout << "Failed execution: insert user." << endl;		//test ***********
+		cout << "Failed database execution: insert user." << endl;		//test ***********
 		return false;
 	}
 	sqlite3_finalize(stmt);
@@ -67,7 +67,7 @@ bool SqliteController::insertFriend(const string& userID1, const string& userID2
 	rc = sqlite3_step(stmt);
 	if (rc != SQLITE_DONE) {
 		sqlite3_finalize(stmt);
-		cout << "Failed execution: insert friends ( " << sqlite3_errmsg(m_db) << " )" << endl;		//test ***********
+		cout << "Failed database execution: insert friends ( " << sqlite3_errmsg(m_db) << " )" << endl;		//test ***********
 		return false;
 	}
 	sqlite3_finalize(stmt);
@@ -108,11 +108,11 @@ bool SqliteController::insertGroup(int& groupID, const string& groupName)
 	return true;
 }
 
-bool SqliteController::insertGroupMember(const int& groupID, const string& userID)
+bool SqliteController::insertGroupMember(const int& groupID, const string& userID, const string& userName)
 {
 	int rc = SQLITE_ERROR;
 	sqlite3_stmt* stmt;
-	const char* sql_insert_groupMember = "INSERT INTO groupMembers (groupID, userID, identity) VALUES (?, ?, ?)";
+	const char* sql_insert_groupMember = "INSERT INTO groupMembers (groupID, userID, userName, identity) VALUES (?, ?, ?, ?)";
 
 	//prepare sql
 	rc = sqlite3_prepare_v2(m_db, sql_insert_groupMember, -1, &stmt, NULL);
@@ -124,14 +124,82 @@ bool SqliteController::insertGroupMember(const int& groupID, const string& userI
 	//bind variables
 	sqlite3_bind_int(stmt, 1, groupID);
 	sqlite3_bind_text(stmt, 2, userID.c_str(), -1, NULL);
-	sqlite3_bind_int(stmt, 3, static_cast<int>(GroupMemberIdentity::Member));
+	sqlite3_bind_text(stmt, 3, userName.c_str(), -1, NULL);
+	sqlite3_bind_int(stmt, 4, static_cast<int>(GroupMemberIdentity::Member));
 
 	//execute
 	unique_lock<mutex> lock(m_mutex);	//lock
 	rc = sqlite3_step(stmt);
 	if (rc != SQLITE_DONE) {
 		sqlite3_finalize(stmt);
-		cout << "Failed execution: insert group member( " << sqlite3_errmsg(m_db) << " )" << endl;		//test ***********
+		cout << "Failed database execution: insert group member( " << sqlite3_errmsg(m_db) << " )" << endl;		//test ***********
+		return false;
+	}
+
+	sqlite3_finalize(stmt);
+
+	return true;
+}
+
+bool SqliteController::insertPrivateMessage(const string& senderID, const string& receiverID, const string& content, const string& timestamp)
+{
+	int rc = SQLITE_ERROR;
+	sqlite3_stmt* stmt;
+	const char* sql_insert_privateMessages = "INSERT INTO privateMessages (senderID, receiverID, content, timestamp) VALUES (?, ?, ?, ?)";
+
+	//prepare sql
+	rc = sqlite3_prepare_v2(m_db, sql_insert_privateMessages, -1, &stmt, NULL);
+	if (rc != SQLITE_OK) {
+		cout << "Failed to prepare statement for insert private message." << endl;		//test ***********
+		return false;
+	}
+
+	//bind variables
+	sqlite3_bind_text(stmt, 1, senderID.c_str(), -1, NULL);
+	sqlite3_bind_text(stmt, 2, receiverID.c_str(), -1, NULL);
+	sqlite3_bind_text(stmt, 3, content.c_str(), -1, NULL);
+	sqlite3_bind_text(stmt, 4, timestamp.c_str(), -1, NULL);
+
+	//execute
+	unique_lock<mutex> lock(m_mutex);	//lock
+	rc = sqlite3_step(stmt);
+	if (rc != SQLITE_DONE) {
+		sqlite3_finalize(stmt);
+		cout << "Failed database execution: insert private message( " << sqlite3_errmsg(m_db) << " )" << endl;		//test ***********
+		return false;
+	}
+
+	sqlite3_finalize(stmt);
+
+	return true;
+}
+
+bool SqliteController::insertGroupMessage(const string& senderID, const string& receiverID, const int groupID, const string& content, const string& timestamp)
+{
+	int rc = SQLITE_ERROR;
+	sqlite3_stmt* stmt;
+	const char* sql_insert_groupMessages = "INSERT INTO groupMessages (senderID, receiverID, groupID, content, timestamp) VALUES (?, ?, ?, ?, ?)";
+
+	//prepare sql
+	rc = sqlite3_prepare_v2(m_db, sql_insert_groupMessages, -1, &stmt, NULL);
+	if (rc != SQLITE_OK) {
+		cout << "Failed to prepare statement for insert group message." << endl;		//test ***********
+		return false;
+	}
+
+	//bind variables
+	sqlite3_bind_text(stmt, 1, senderID.c_str(), -1, NULL);
+	sqlite3_bind_text(stmt, 2, receiverID.c_str(), -1, NULL);
+	sqlite3_bind_int(stmt, 3, groupID);
+	sqlite3_bind_text(stmt, 4, content.c_str(), -1, NULL);
+	sqlite3_bind_text(stmt, 5, timestamp.c_str(), -1, NULL);
+
+	//execute
+	unique_lock<mutex> lock(m_mutex);	//lock
+	rc = sqlite3_step(stmt);
+	if (rc != SQLITE_DONE) {
+		sqlite3_finalize(stmt);
+		cout << "Failed database execution: insert group message( " << sqlite3_errmsg(m_db) << " )" << endl;		//test ***********
 		return false;
 	}
 
@@ -393,7 +461,7 @@ bool SqliteController::isUserID(const string& userID)
 	}
 }
 
-bool SqliteController::queryUser(const string& userID, userInfo& result)
+bool SqliteController::queryUser(const string& userID, UserInfo& result)
 {
 	int rc = SQLITE_ERROR;
 	sqlite3_stmt* stmt;
@@ -662,11 +730,11 @@ bool SqliteController::queryGroupName(const int& groupID, string& result)
 	}
 }
 
-bool SqliteController::queryGroupMembers(const int& groupID, vector<pair<string, GroupMemberIdentity>>& result)
+bool SqliteController::queryGroupMembers(const int& groupID, vector<pair<string, string>>& result)
 {
 	int rc = SQLITE_ERROR;
 	sqlite3_stmt* stmt;
-	const char* sql_select_groupMembers = "SELECT userID, identity FROM groupMembers WHERE groupID = ? ";
+	const char* sql_select_groupMembers = "SELECT userID, userName FROM groupMembers WHERE groupID = ? ";
 
 	//prepare sql
 	rc = sqlite3_prepare_v2(m_db, sql_select_groupMembers, -1, &stmt, NULL);
@@ -683,8 +751,9 @@ bool SqliteController::queryGroupMembers(const int& groupID, vector<pair<string,
 	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
 		//member exist
 		string userID = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-		GroupMemberIdentity identity = static_cast<GroupMemberIdentity>(sqlite3_column_int(stmt, 1));
-		result.push_back({ userID, identity });
+		string userName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+		//GroupMemberIdentity identity = static_cast<GroupMemberIdentity>(sqlite3_column_int(stmt, 1));
+		result.push_back({ userID, userName });
 	}
 
 	if (rc != SQLITE_DONE) {
@@ -750,11 +819,90 @@ void SqliteController::queryAllData(int table)
 	}
 }
 
+bool SqliteController::takePrivateMsg(const string& receiverID, vector<PrivateMsg>& messages)
+{
+	int rc = SQLITE_ERROR;
+	sqlite3_stmt* stmt;
+	const char* sql_select_privateMessages = "SELECT senderID, content, timestamp FROM privateMessages WHERE receiverID = ? ";
+
+	//prepare sql
+	rc = sqlite3_prepare_v2(m_db, sql_select_privateMessages, -1, &stmt, NULL);
+	if (rc != SQLITE_OK) {
+		cout << "Failed to prepare statement for selecting unreceived private messages." << endl;		//test ***********
+		return false;
+	}
+
+	//bind variables
+	sqlite3_bind_text(stmt, 1, receiverID.c_str(), -1, NULL);
+
+	//execute
+	unique_lock<mutex> lock(m_mutex);	//lock
+	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+		//member exist
+		PrivateMsg msg;
+		msg.senderID = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+		msg.content = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+		msg.timestamp = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+		//GroupMemberIdentity identity = static_cast<GroupMemberIdentity>(sqlite3_column_int(stmt, 1));
+		messages.push_back(msg);
+	}
+
+	if (rc != SQLITE_DONE) {
+		//err
+		sqlite3_finalize(stmt);
+		cout << "Failed execution: select unreceived private messages." << endl;		//test ***********
+		return false;
+	}
+
+	sqlite3_finalize(stmt);
+	return true;
+}
+
+bool SqliteController::takeGroupMsg(const string& receiverID, vector<GroupMsg>& messages)
+{
+	int rc = SQLITE_ERROR;
+	sqlite3_stmt* stmt;
+	const char* sql_select_groupMessages = "SELECT senderID, groupID, content, timestamp FROM groupMessages WHERE receiverID = ? ";
+
+	//prepare sql
+	rc = sqlite3_prepare_v2(m_db, sql_select_groupMessages, -1, &stmt, NULL);
+	if (rc != SQLITE_OK) {
+		cout << "Failed to prepare statement for selecting unreceived group messages." << endl;		//test ***********
+		return false;
+	}
+
+	//bind variables
+	sqlite3_bind_text(stmt, 1, receiverID.c_str(), -1, NULL);
+
+	//execute
+	unique_lock<mutex> lock(m_mutex);	//lock
+	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+		//member exist
+		GroupMsg msg;
+		msg.senderID = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+		msg.groupID = sqlite3_column_int(stmt, 1);
+		msg.content = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+		msg.timestamp = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+		//GroupMemberIdentity identity = static_cast<GroupMemberIdentity>(sqlite3_column_int(stmt, 1));
+		messages.push_back(msg);
+	}
+
+	if (rc != SQLITE_DONE) {
+		//err
+		sqlite3_finalize(stmt);
+		cout << "Failed execution: select unreceived group messages." << endl;		//test ***********
+		return false;
+	}
+
+	sqlite3_finalize(stmt);
+	return true;
+}
+
 bool SqliteController::init(string& errMsg) {
 	int rc = SQLITE_ERROR;
 
 	//open database
-	rc = sqlite3_open(DP_PATH.c_str(), &m_db);
+	rc = sqlite3_open(m_path, &m_db);
 	if (rc != SQLITE_OK) {
 		errMsg = "Create database failed.";	//write errMsg
 		return false;
@@ -797,6 +945,7 @@ bool SqliteController::init(string& errMsg) {
 			CREATE TABLE groupMembers (\
 			groupID		INT		 NOT NULL,\
 			userID		CHAR(10) NOT NULL,\
+			userName	CHAR(20) NOT NULL,\
 			identity	INT		 DEFAULT 2,\
 			UNIQUE(groupID, userID),\
 			FOREIGN KEY (groupID) REFERENCES groups (groupID)  ON DELETE CASCADE,\
@@ -804,15 +953,29 @@ bool SqliteController::init(string& errMsg) {
 			)\
 		", errMsg)) return false;
 
-	//create initial messages tables
+	//create private messages tables
 	if (!exec("\
-			CREATE TABLE messages (\
+			CREATE TABLE privateMessages (\
 			senderID	CHAR(10)		NOT NULL,\
 			receiverID	CHAR(10)		NOT NULL,\
 			content		VARCHAR(500)	NOT NULL,\
 			timestamp	DATETIME		DEFAULT CURRENT_TIMESTAMP,\
 			FOREIGN KEY (senderID) REFERENCES users (userID),\
 			FOREIGN KEY (receiverID) REFERENCES users (userID)\
+			)\
+		", errMsg)) return false;
+
+	//create group messages tables
+	if (!exec("\
+			CREATE TABLE groupMessages (\
+			senderID	CHAR(10)		NOT NULL,\
+			receiverID	CHAR(10)		NOT NULL,\
+			groupID		INT				NOT NULL,\
+			content		VARCHAR(500)	NOT NULL,\
+			timestamp	DATETIME		DEFAULT CURRENT_TIMESTAMP,\
+			FOREIGN KEY (senderID) REFERENCES users (userID),\
+			FOREIGN KEY (receiverID) REFERENCES users (userID),\
+			FOREIGN KEY (groupID) REFERENCES groups (groupID)  ON DELETE CASCADE\
 			)\
 		", errMsg)) return false;
 
@@ -823,14 +986,14 @@ bool SqliteController::init(string& errMsg) {
 bool SqliteController::open(string& errMsg) {
 	int rc = SQLITE_ERROR;
 
-	if (!filesystem::exists(DP_PATH)) {
+	if (!filesystem::exists(m_path)) {
 		//create database and init table
 		if (!init(errMsg)) {
 			return false;
 		}
 	}
 	else {
-		rc = sqlite3_open(DP_PATH.c_str(), &m_db);
+		rc = sqlite3_open(m_path, &m_db);
 		if (rc != SQLITE_OK) {
 			errMsg = "Open database failed.";	//write errMsg
 			return false;

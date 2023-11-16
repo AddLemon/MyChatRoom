@@ -18,10 +18,7 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Socket_Serv.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Packet_Serv.cpp">
+    <ClCompile Include="acceptor.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Server.cpp">
@@ -39,12 +36,18 @@
     <ClCompile Include="sqlite3.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="commands.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="socket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dispatcher.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Socket_Serv.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Packet_Serv.h">
+    <ClInclude Include="acceptor.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Server.h">
@@ -60,6 +63,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="sqlite3.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="commands.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="socket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="public.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dispatcher.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

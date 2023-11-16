@@ -1,10 +1,10 @@
 #pragma once
-#include "TaskQueue.h"
 #include <iostream>
 #include <condition_variable>
 #include <string.h>
 #include <string>
 #include <chrono>
+#include "TaskQueue.h"
 
 #define THREAD_DESTROY_NUMBER 2     // The number of threads destroyed at a time
 #define THREAD_MAX_NUMBER 10
@@ -37,7 +37,7 @@ public:
     ~ThreadPool();
 
     //Add tasks to the thread pool
-    void addTask(Task* task);
+    void addTask(Command* task);
 
     //Get the number of busy threads in the thread pool
     int getBusyNum();

@@ -3,6 +3,7 @@
 #include <thread>
 #include <mutex>
 #include <functional>
+#include "commands.h"
 using namespace std;
 
 //task structure
@@ -26,14 +27,14 @@ private:
 class TaskQueue
 {
 private:
-	queue<Task*> m_taskQ;
+	queue<Command*> m_taskQ;
 	mutex m_mutex;
 public:
 	//Add task
-	void addTask(Task* task);
+	void addTask(Command* task);
 
 	//Take out a task
-	Task* takeTask();
+	Command* takeTask();
 
 	//Get the current number of tasks
 	size_t taskNumber() {

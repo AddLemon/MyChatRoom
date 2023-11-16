@@ -4,90 +4,122 @@ Server* Server::m_server = new Server;	//init static member variables
 
 Server::Server()
 {	
-	//init handler map
-	m_handlerMap[REGISTER_UP] = bind(&Server::dealRegister, this, std::placeholders::_1);
-	m_handlerMap[LOG_IN] = bind(&Server::dealLogin, this, std::placeholders::_1);
-	m_handlerMap[MODIFY_USER_INFO] = bind(&Server::dealModifyUserInfo, this, std::placeholders::_1);
-	m_handlerMap[FIND_USER] = bind(&Server::dealFindUser, this, std::placeholders::_1);
-	m_handlerMap[ADD_FRIEND] = bind(&Server::dealAddFriend, this, std::placeholders::_1);
-	m_handlerMap[REMOVE_FRIEND] = bind(&Server::dealRemoveFriend, this, std::placeholders::_1);
-	m_handlerMap[FIND_GROUP] = bind(&Server::dealFindGroup, this, std::placeholders::_1);
-	m_handlerMap[ADD_GROUP] = bind(&Server::dealAddGroup, this, std::placeholders::_1);
-	m_handlerMap[REMOVE_GROUP] = bind(&Server::dealRemoveGroup, this, std::placeholders::_1);
-	m_handlerMap[CREATE_GROUP] = bind(&Server::dealCreateGroup, this, std::placeholders::_1);
-	m_handlerMap[MODIFY_GROUP_INFO] = bind(&Server::dealModifyGroupInfo, this, std::placeholders::_1);
-	m_handlerMap[PRIVATE_CHAT] = bind(&Server::dealPrivateChat, this, std::placeholders::_1);
-	m_handlerMap[GROUP_CHAT] = bind(&Server::dealGroupChat, this, std::placeholders::_1);
+	////init handler map
+	//m_handlerMap[ClientMsgType::REGISTER_UP] = bind(&Server::dealRegister, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::LOG_IN] = bind(&Server::dealLogin, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::MODIFY_USER_INFO] = bind(&Server::dealModifyUserInfo, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::FIND_USER] = bind(&Server::dealFindUser, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::ADD_FRIEND] = bind(&Server::dealAddFriend, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::REMOVE_FRIEND] = bind(&Server::dealRemoveFriend, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::FIND_GROUP] = bind(&Server::dealFindGroup, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::ADD_GROUP] = bind(&Server::dealAddGroup, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::REMOVE_GROUP] = bind(&Server::dealRemoveGroup, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::CREATE_GROUP] = bind(&Server::dealCreateGroup, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::MODIFY_GROUP_INFO] = bind(&Server::dealModifyGroupInfo, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::PRIVATE_CHAT] = bind(&Server::dealPrivateChat, this, std::placeholders::_1);
+	//m_handlerMap[ClientMsgType::GROUP_CHAT] = bind(&Server::dealGroupChat, this, std::placeholders::_1);
 
+	m_database = new SqliteController();
+	//m_threadPool = new ThreadPool();
 	cout << "server init success" << endl;		// test ******************
 }
 
-Json::Value Server::dispatchRequest(const MsgType type, Json::Value pkt)
+Server::~Server()
 {
-	if (type != SERVER_REPLY) {
-		return m_handlerMap[type](pkt);
+	//delete m_threadPool;
+	delete m_database;
+	for (map<string, Socket*>::iterator i = m_socketMap.begin();
+		i != m_socketMap.end(); ++i)
+	{
+		delete i->second;
+		i->second = nullptr;
 	}
-	// todo unknown type
 }
 
-Json::Value Server::dealRegister(Json::Value pkt)
+bool Server::receive(Socket* sockPtr, Json::Value& deserialized_pkt)
 {
-	//extract temporary id
-	string tmpID = pkt["header"]["senderID"].asString();
+	string pkt;
+	bool a = sockPtr->read(pkt);
+	if (a) {
+		deserialized_pkt = deserialize(pkt);
+		return true;
+	}
+	return false;
+}
 
-	//get user id , name and message from json value
-	string userID = pkt["message"]["userID"].asString();
-	string userName = pkt["message"]["userName"].asString();
-	string password = pkt["message"]["password"].asString();
+void Server::send(string id, Json::Value pkt)
+{
+	Json::StyledWriter sw;			//test ********************
+	cout << endl << "server send: " << endl << sw.write(pkt) << endl;	//test ********************
+	//serialize
+	string serialized_pkt = serialize(pkt);
 
+	//get socket and write
+	map<string, Socket*>::iterator i = m_socketMap.find(id);
+	if (i != m_socketMap.end()) {
+		//user is online
+		Socket* sockPtr = i->second;
+		sockPtr->write(serialized_pkt);
+	}
+}
+
+string Server::serialize(Json::Value pkt)
+{
+	Json::FastWriter writer;
+	string str = writer.write(pkt);
+	return str;
+}
+
+Json::Value Server::deserialize(string pkt)
+{
+	Json::Value jpkt;
+	Json::Reader reader;
+	if (!reader.parse(pkt.data(), jpkt)) {
+		cout << "Fail: Failed to parse data." << endl;		//test **********
+	}
+	return jpkt;
+}
+
+Json::Value Server::dealRegister(string id, string name, string password)
+{
 	//check if user id is unique
 	Json::Value new_message;
 
-	if (m_database.isUserID(userID)) {
+	if (m_database->isUserID(id)) {
 		//user id already exist
-		
 		new_message["status"] = false;
 		new_message["reason"] = "User ID already exist";
 	}
 	else {
 		//user id is avaliable, insert to database
-		m_database.insertUser(userID, userName, password);
+		m_database->insertUser(id, name, password);
 
 		//modify pkt json value to send
 		new_message["status"] = true;
 	}
 
 	//modify pkt json value to send
-	pkt["message"] = new_message;
-
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealLogin(Json::Value pkt)
-{
-	//extract temporary id
-	string tmpID = pkt["header"]["senderID"].asString();
-
-	//get user id and message from json value
-	string userID = pkt["message"]["userID"].asString();
-	string password = pkt["message"]["password"].asString();
-	
+Json::Value Server::dealLogin(string& tmpID, string userID, string password)
+{	
 	//check if user id is exist
 	Json::Value new_message;
 
-	if (m_database.isUserID(userID)) {
+	if (m_database->isUserID(userID)) {
 		//user id exist, select data from database
 		string result;
-		bool a = m_database.queryUserPassword(userID, result);
+		bool a = m_database->queryUserPassword(userID, result);
 		if (a && password == result) {
 			//query data from database
 			string db_userName;
 			vector<pair<string, string>> db_friends;
 			vector<pair<string, string>> db_groups;
 
-			m_database.queryUserName(userID, db_userName);
-			m_database.queryFriendList(userID, db_friends);
-			m_database.queryGroupList(userID, db_groups);
+			m_database->queryUserName(userID, db_userName);
+			m_database->queryFriendList(userID, db_friends);
+			m_database->queryGroupList(userID, db_groups);
 
 			//success, modify pkt json value to send
 			Json::Value data;
@@ -119,8 +151,8 @@ Json::Value Server::dealLogin(Json::Value pkt)
 			new_message["data"] = data;
 
 			//renew senderID and socketMap
-			pkt["header"]["senderID"] = userID;
 			renewSocketMapKey(tmpID, userID);
+			tmpID = userID;
 		}
 		else {
 			//password is not correct
@@ -134,31 +166,20 @@ Json::Value Server::dealLogin(Json::Value pkt)
 		new_message["reason"] = "User ID is incorrect.";
 	}
 
-	//modify pkt json value to send
-	pkt["message"] = new_message;
-
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealModifyUserInfo(Json::Value pkt)
+Json::Value Server::dealModifyUserInfo(string senderID, string name, string password)
 {
-	//get senderID from json value
-	string senderID = pkt["header"]["senderID"].asString();
-
-	//get message from json value
-	Json::Value message = pkt["message"];
-	
 	//check which info to modify
 	bool a = false;
-	if (message.isMember("userName")) {
+	if (!name.empty()) {
 		//renew userName
-		string userName = message["userName"].asString();
-		a = m_database.updateUserName(senderID, userName);
+		a = m_database->updateUserName(senderID, name);
 	}
-	if (message.isMember("password")) {
+	if (!password.empty()) {
 		//renew password
-		string password = message["password"].asString();
-		a = m_database.updateUserPassword(senderID, password);
+		a = m_database->updateUserPassword(senderID, password);
 	}
 	/* add on */
 
@@ -173,21 +194,14 @@ Json::Value Server::dealModifyUserInfo(Json::Value pkt)
 		new_message["status"] = false;
 		new_message["reason"] = "Update failed.";
 	}
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealFindUser(Json::Value pkt)
+Json::Value Server::dealFindUser(string friendID)
 {
-	//get senderID from json value
-	string senderID = pkt["header"]["senderID"].asString();
-
-	//get friendID that need to find from json value
-	string friendID = pkt["message"]["userID"].asString();
-
 	//find from database
-	bool a = m_database.isUserID(friendID);
+	bool a = m_database->isUserID(friendID);
 
 	//modify pkt json value to send
 	Json::Value new_message;
@@ -196,7 +210,7 @@ Json::Value Server::dealFindUser(Json::Value pkt)
 		//query data from database
 		string db_userName_friend;
 
-		m_database.queryUserName(friendID, db_userName_friend);
+		m_database->queryUserName(friendID, db_userName_friend);
 
 		//success, modify pkt json value to send
 		Json::Value data;
@@ -212,21 +226,14 @@ Json::Value Server::dealFindUser(Json::Value pkt)
 		new_message["status"] = false;
 		new_message["reason"] = "User not found.";
 	}
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealAddFriend(Json::Value pkt)
+Json::Value Server::dealAddFriend(string senderID, string friendID, Json::Value& notice_msg)
 {
-	//get senderID from json value
-	string senderID = pkt["header"]["senderID"].asString();
-
-	//get userID that need to find from json value
-	string friendID = pkt["message"]["friendID"].asString();
-
 	//record to database
-	bool a = m_database.insertFriend(senderID, friendID);
+	bool a = m_database->insertFriend(senderID, friendID);
 
 	//check if success
 	Json::Value new_message;
@@ -237,92 +244,55 @@ Json::Value Server::dealAddFriend(Json::Value pkt)
 		string db_userName_sender;
 		string db_userName_friend;
 
-		m_database.queryUserName(senderID, db_userName_sender);
-		m_database.queryUserName(friendID, db_userName_friend);
+		m_database->queryUserName(senderID, db_userName_sender);
+		m_database->queryUserName(friendID, db_userName_friend);
 
 		//success, modify pkt json value to send
 		Json::Value data_back;
-		Json::Value data_toFriend;
-
 		data_back["userID"] = friendID;
 		data_back["userName"] = db_userName_friend;
-		data_toFriend["userID"] = senderID;
-		data_toFriend["userName"] = db_userName_sender;
-
 		new_message["status"] = true;
 		new_message["data"] = data_back;
 
-		/* forward pkt to friend */
-		Json::Value pkt_toFriend = pkt;
-		pkt_toFriend["header"]["type"] = SERVER_NOTICE_NEW_FRIEND;
-		pkt_toFriend["header"]["receiverID"] = friendID;
-		pkt_toFriend["message"] = data_toFriend;
-		//notice friend
-		// TODO ***********************************
-		// check if friend is noline
-		//send();
+		notice_msg["userID"] = senderID;
+		notice_msg["userName"] = db_userName_sender;
 	}
 	else {
 		//not exist
 		new_message["status"] = false;
 		new_message["reason"] = "User not found.";
 	}
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealRemoveFriend(Json::Value pkt)
+Json::Value Server::dealRemoveFriend(string senderID, string friendID, Json::Value& notice_msg)
 {
-	//get senderID from json value
-	string senderID = pkt["header"]["senderID"].asString();
-
-	//get userID that need to find from json value
-	string friendID = pkt["message"]["userID"].asString();
-
 	//remove from database
-	bool a = m_database.deleteFriend(senderID, friendID);
+	bool a = m_database->deleteFriend(senderID, friendID);
 
 	//check if success
 	Json::Value new_message;
 
 	if (a) {
 		//success, modify pkt json value to send
-		Json::Value data_toFriend;
-		data_toFriend["userID"] = senderID;
+		notice_msg["userID"] = senderID;
 
 		new_message["status"] = true;
-
-		/* forward pkt to friend */
-		Json::Value pkt_toFriend = pkt;
-		pkt_toFriend["header"]["type"] = SERVER_NOTICE_REMOVE_FRIEND;
-		pkt_toFriend["header"]["receiverID"] = friendID;
-		pkt_toFriend["message"] = data_toFriend;
-		//notice friend
-		// TODO ***********************************
-		// check if friend is noline
-		//send();
 	}
 	else {
 		//not exist
 		new_message["status"] = false;
 		new_message["reason"] = "Failed to delete.";
 	}
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealFindGroup(Json::Value pkt)
+Json::Value Server::dealFindGroup(int groupID)
 {
-	//get senderID from json value
-	string senderID = pkt["header"]["senderID"].asString();
-
-	//get groupID that need to find from json value
-	int groupID = pkt["message"]["groupID"].asInt();
-
 	//find from database
-	bool a = m_database.isGroupID(groupID);
+	bool a = m_database->isGroupID(groupID);
 
 	//modify pkt json value to send
 	Json::Value new_message;
@@ -331,7 +301,7 @@ Json::Value Server::dealFindGroup(Json::Value pkt)
 		//query data from database
 		string db_groupName;
 
-		m_database.queryGroupName(groupID, db_groupName);
+		m_database->queryGroupName(groupID, db_groupName);
 
 		//success, modify pkt json value to send
 		Json::Value data;
@@ -347,21 +317,16 @@ Json::Value Server::dealFindGroup(Json::Value pkt)
 		new_message["status"] = false;
 		new_message["reason"] = "Group not found.";
 	}
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealAddGroup(Json::Value pkt)
+Json::Value Server::dealAddGroup(string senderID, int groupID)
 {
-	//get senderID from json value
-	string senderID = pkt["header"]["senderID"].asString();
-
-	//get groupID that need to find from json value
-	int groupID = pkt["message"]["groupID"].asInt();
-
 	//record to database
-	bool a = m_database.insertGroupMember(groupID, senderID);
+	string userName;
+	m_database->queryUserName(senderID, userName);
+	bool a = m_database->insertGroupMember(groupID, senderID, userName);
 
 	//check if success
 	Json::Value new_message;
@@ -371,7 +336,7 @@ Json::Value Server::dealAddGroup(Json::Value pkt)
 		//query data from database
 		string db_groupName;
 
-		m_database.queryGroupName(groupID, db_groupName);
+		m_database->queryGroupName(groupID, db_groupName);
 
 		//success, modify pkt json value to send
 		Json::Value data;
@@ -387,21 +352,14 @@ Json::Value Server::dealAddGroup(Json::Value pkt)
 		new_message["status"] = false;
 		new_message["reason"] = "Failed to join the group.";
 	}
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealRemoveGroup(Json::Value pkt)
+Json::Value Server::dealRemoveGroup(string senderID, int groupID)
 {
-	//get senderID from json value
-	string senderID = pkt["header"]["senderID"].asString();
-
-	//get groupID that need to find from json value
-	int groupID = pkt["message"]["groupID"].asInt();
-
 	//record to database
-	bool a = m_database.deleteGroupMember(groupID, senderID);
+	bool a = m_database->deleteGroupMember(groupID, senderID);
 
 	//check if success
 	Json::Value new_message;
@@ -415,22 +373,54 @@ Json::Value Server::dealRemoveGroup(Json::Value pkt)
 		new_message["status"] = false;
 		new_message["reason"] = "Failed to leave the group.";
 	}
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealCreateGroup(Json::Value pkt)
+Json::Value Server::dealGetMembers(int groupID)
 {
-	//get senderID from json value
-	string senderID = pkt["header"]["senderID"].asString();
+	//find from database
+	bool a = m_database->isGroupID(groupID);
 
-	//get groupName that need to find from json value
-	string groupName = pkt["message"]["groupName"].asString();
+	//modify pkt json value to send
+	Json::Value new_message;
+	if (a) {
+		//exist
+		//query data from database
+		vector<pair<string, string>> db_members;
 
+		m_database->queryGroupMembers(groupID, db_members);
+
+		//success, modify pkt json value to send
+		Json::Value data;
+		Json::Value members;
+
+		for (const auto& pair : db_members) {
+			Json::Value jsonObj;
+			jsonObj["userID"] = pair.first;
+			jsonObj["userName"] = pair.second;
+			members.append(jsonObj);
+		}
+
+		data["members"] = members;
+
+		new_message["status"] = true;
+		new_message["data"] = data;
+	}
+	else {
+		//not exist
+		new_message["status"] = false;
+		new_message["reason"] = "Group not found.";
+	}
+
+	return new_message;
+}
+
+Json::Value Server::dealCreateGroup(string senderID, string groupName)
+{
 	//record to database
 	int groupID;
-	bool a = m_database.insertGroup(groupID, senderID);
+	bool a = m_database->insertGroup(groupID, groupName);
 
 	//check if success
 	Json::Value new_message;
@@ -449,30 +439,21 @@ Json::Value Server::dealCreateGroup(Json::Value pkt)
 		new_message["status"] = false;
 		new_message["reason"] = "Failed to leave the group.";
 	}
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealModifyGroupInfo(Json::Value pkt)
+Json::Value Server::dealModifyGroupInfo(string senderID, int groupID, string newName)
 {
-	//get userID from json value
-	string userID = pkt["header"]["senderID"].asString();
-
-	//get message from json value
-	int groupID = pkt["message"]["groupID"].asInt();
-	Json::Value newInfo = pkt["message"]["newInfo"];
-
 	//check if user have right to modify
 	Json::Value new_message;
 
-	if (m_database.isGroupOwner(userID, groupID)) {
+	if (m_database->isGroupOwner(senderID, groupID)) {
 		//check which info to modify
 		bool a = false;
-		if (newInfo.isMember("groupName")) {
+		if (!newName.empty()) {
 			//renew groupName
-			string groupName = newInfo["groupName"].asString();
-			a = m_database.updateGroupName(groupID, groupName);
+			a = m_database->updateGroupName(groupID, newName);
 		}
 		/* add on */
 
@@ -492,44 +473,55 @@ Json::Value Server::dealModifyGroupInfo(Json::Value pkt)
 		new_message["status"] = false;
 		new_message["reason"] = "No permission to modify.";
 	}
-	
-	pkt["message"] = new_message;
 
-	return pkt;
+	return new_message;
 }
 
-Json::Value Server::dealPrivateChat(Json::Value pkt)
+Json::Value Server::dealPrivateChat(string senderID, string receiverID, string content, string timestamp, bool& isOL)
 {
-	return Json::Value();
-}
+	Json::Value new_msg;
+	new_msg["content"] = content;
+	new_msg["timestamp"] = timestamp;
 
-Json::Value Server::dealGroupChat(Json::Value pkt)
-{
-	return Json::Value();
-}
-
-void Server::feedback(Json::Value new_pkt)
-{
-	//get receiver`s socket
-	SockPtr recvSock = nullptr;
-	string senderID = new_pkt["header"]["senderID"].asString();
-	if (m_socketMap.find(senderID) != m_socketMap.end()) {
-		//client is online
-		recvSock = m_socketMap[senderID];
+	//check whether receiver is online
+	if (isOnline(receiverID)) {
+		//online
+		isOL = true;
 	}
 	else {
-		//client is offline
-		return;
+		//not online
+		isOL = false;
+		m_database->insertPrivateMessage(senderID, receiverID, content, timestamp);
 	}
 
-	//modify msg type
-	new_pkt["header"]["type"] = SERVER_REPLY;
+	return new_msg;
+}
 
-	//send feedback
-	//sendMsg(recvSock, new_pkt);
+Json::Value Server::dealGroupChat(string senderID, int groupID, string content, string timestamp, queue<string>& onlineMembers)
+{
+	Json::Value new_msg;
+	new_msg["content"] = content;
+	new_msg["timestamp"] = timestamp;
 
+	bool a = false;
 
-	
+	//group exist, get all members
+	vector<pair<string, string>> members;
+	m_database->queryGroupMembers(groupID, members);
+
+	//get online members and store message for offline members
+	for (const auto& i : members) {
+		if (isOnline(i.first)) {
+			//online
+			onlineMembers.push(i.first);
+		}
+		else {
+			//offline
+			m_database->insertGroupMessage(senderID, i.first, groupID, content, timestamp);
+		}
+	}
+
+	return new_msg;
 }
 
 void Server::renewSocketMapKey(string oldKey, string newKey)
@@ -540,3 +532,36 @@ void Server::renewSocketMapKey(string oldKey, string newKey)
 		m_socketMap.erase(it);              // delete old key-value pair
 	}
 }
+
+void Server::newConnect(string id, Socket* sockPtr)
+{
+	//lock
+	unique_lock<mutex> lock(m_mutex);
+	m_socketMap.insert(pair<string, Socket*>(id, sockPtr));
+}
+
+void Server::disConnect(string id)
+{
+	//lock
+	unique_lock<mutex> lock(m_mutex);
+	m_socketMap.erase(id);
+}
+
+Socket* Server::getSocket(string id)
+{
+	//lock
+	unique_lock<mutex> lock(m_mutex);
+	return m_socketMap.at(id);
+}
+
+bool Server::isOnline(string id)
+{
+	//lock
+	unique_lock<mutex> lock(m_mutex);
+	map<string, Socket*>::iterator i = m_socketMap.find(id);
+	if (i != m_socketMap.end()) {
+		return true;
+	}
+	return false;
+}
+

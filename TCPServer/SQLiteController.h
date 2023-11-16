@@ -11,12 +11,24 @@ using namespace std;
 #define USER_PASSWORD_LENGTH 20
 #define GROUP_ID_LENGTH 8
 #define CONTENT_LENGTH 500
-const string DP_PATH = "chatRoom.db";
 
-struct userInfo {
+struct UserInfo {
 	string userID;
 	string userName;
 	string password;
+};
+
+struct PrivateMsg {
+	string senderID;
+	string content;
+	string timestamp;
+};
+
+struct GroupMsg {
+	string senderID;
+	int groupID = 0;
+	string content;
+	string timestamp;
 };
 
 enum class GroupMemberIdentity {
@@ -34,7 +46,9 @@ public:
 	bool insertUser(const string& userID, const string& userName, const string& password);	//添加用户
 	bool insertFriend(const string& userID1, const string& userID2);	//添加好友关系
 	bool insertGroup(int& groupID, const string& groupName);	//添加群组			//new
-	bool insertGroupMember(const int& groupID, const string& userID);	//添加群成员			//new
+	bool insertGroupMember(const int& groupID, const string& userID, const string& userName);	//添加群成员			//new
+	bool insertPrivateMessage(const string& senderID, const string& receiverID, const string& content, const string& timestamp);
+	bool insertGroupMessage(const string& senderID, const string& receiverID, const int groupID, const string& content, const string& timestamp);
 
 	//删
 	/// <summary>
@@ -55,7 +69,7 @@ public:
 
 	//查
 	bool isUserID(const string& userID);	//查询是否存在此user id
-	bool queryUser(const string& userID, userInfo& result);	//读取用户基本信息，待定
+	bool queryUser(const string& userID, UserInfo& result);	//读取用户基本信息，待定
 	bool queryUserName(const string& userID, string& result);	//读取用户名称
 	bool queryUserPassword(const string& userID, string& result); //读取用户密码
 	bool queryFriendList(const string& userID, vector<pair<string,string>>& result);	//读取好友列表
@@ -63,7 +77,7 @@ public:
 
 	bool isGroupID(const int& groupID);		////查询是否存在此group id			//new
 	bool queryGroupName(const int& groupID, string& result);	//读取群组名称			//new
-	bool queryGroupMembers(const int& groupID, vector<pair<string, GroupMemberIdentity>>& result);	//读取群组成员			//new
+	bool queryGroupMembers(const int& groupID, vector<pair<string, string>>& result);	//读取群组成员			//new
 
 	bool isGroupOwner(const string& userID, const int& groupID);
 
@@ -77,6 +91,11 @@ public:
 	/// 4 is for groupMembers table; 
 	/// 5 is for messages table.</param>
 	void queryAllData(int table);	//输出整个表
+
+	//查+删
+	bool takePrivateMsg(const string& receiverID, vector<PrivateMsg>& messages);
+	bool takeGroupMsg(const string& receiverID, vector<GroupMsg>& messages);
+
 private:
 	bool init(string& errMsg);
 	bool open(string& errMsg);
@@ -89,4 +108,5 @@ private:
 private:
 	sqlite3* m_db;
 	mutex m_mutex;
+	const char* m_path = "D:\\MyWork_CPP\\MyChatRoom\\data\\MyChatRoom.db";
 };

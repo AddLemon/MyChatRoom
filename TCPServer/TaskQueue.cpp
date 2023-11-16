@@ -1,6 +1,6 @@
 #include "TaskQueue.h"
 
-void TaskQueue::addTask(Task* task)
+void TaskQueue::addTask(Command* task)
 {
 	//lock
 	unique_lock<mutex> lock(m_mutex);	//lock
@@ -8,9 +8,9 @@ void TaskQueue::addTask(Task* task)
 	m_taskQ.push(task);
 }
 
-Task* TaskQueue::takeTask()
+Command* TaskQueue::takeTask()
 {
-	Task* task = nullptr;
+	Command* task = nullptr;
 	//lock
 	unique_lock<mutex> lock(m_mutex);
 

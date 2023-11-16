@@ -46,7 +46,7 @@ ThreadPool::~ThreadPool()
 	cout << "complete to destroy thread pool.." << endl;		//test********
 }
 
-void ThreadPool::addTask(Task* task)
+void ThreadPool::addTask(Command* task)
 {
 	if (shutdown) {
 		return;
@@ -112,7 +112,7 @@ void ThreadPool::workerFunc(void* arg)
 		}
 
 		//take a task from the task list
-		Task* task = pool->taskQ->takeTask();
+		Command* task = pool->taskQ->takeTask();
 		pool->busyNum++;
 
 		cout << "thread " << this_thread::get_id() << " start working..." << endl;
@@ -121,8 +121,9 @@ void ThreadPool::workerFunc(void* arg)
 		lock.unlock();
 
 		//Execute function
-		task->run();
-		//delete task;
+		task->execute();
+		task->send();
+		delete task;
 
 		lock.lock();
 		cout << "thread " << this_thread::get_id() << " end working..." << endl;

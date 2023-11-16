@@ -128,19 +128,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="commands.cpp" />
+    <ClCompile Include="dispatcher.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Packet_Serv.cpp" />
     <ClCompile Include="Server.cpp" />
-    <ClCompile Include="Socket_Serv.cpp" />
+    <ClCompile Include="acceptor.cpp" />
+    <ClCompile Include="socket.cpp" />
     <ClCompile Include="sqlite3.c" />
     <ClCompile Include="SQLiteController.cpp" />
     <ClCompile Include="TaskQueue.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Packet_Serv.h" />
+    <ClInclude Include="commands.h" />
+    <ClInclude Include="dispatcher.h" />
+    <ClInclude Include="public.h" />
     <ClInclude Include="Server.h" />
-    <ClInclude Include="Socket_Serv.h" />
+    <ClInclude Include="acceptor.h" />
+    <ClInclude Include="socket.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="SQLiteController.h" />
     <ClInclude Include="TaskQueue.h" />
