@@ -108,5 +108,5 @@ private:
 private:
 	sqlite3* m_db;
 	mutex m_mutex;
-	const char* m_path = "D:\\MyWork_CPP\\MyChatRoom\\data\\MyChatRoom.db";
+	const char* m_path = "MyChatRoom.db";//"D:\\MyWork_CPP\\MyChatRoom\\data\\MyChatRoom.db";
 };
