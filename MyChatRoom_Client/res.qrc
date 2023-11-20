@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/text-bold.png</file>
+        <file>res/text-italic.png</file>
+        <file>res/text-underline.png</file>
+        <file>res/duoli1.jpg</file>
+        <file>res/duoli2.jpg</file>
+        <file>res/kelai1.jpg</file>
+        <file>res/kelai2.jpg</file>
+        <file>res/pingzang1.png</file>
+        <file>res/pingzang2.jpg</file>
+        <file>res/tinali1.jpg</file>
+        <file>res/tinali2.jpg</file>
+        <file>res/list-add.png</file>
+        <file>res/people-minus-one.png</file>
+        <file>res/people-plus-one.png</file>
+        <file>res/setting-two.png</file>
+        <file>res/me.png</file>
+        <file>res/avatar.png</file>
+        <file>res/peoples-two.png</file>
+        <file>res/women.png</file>
+        <file>res/check-one.png</file>
+        <file>res/close-one.png</file>
+        <file>res/correct.png</file>
+        <file>res/error.png</file>
+        <file>res/refresh.png</file>
+        <file>res/caution.png</file>
+        <file>res/unlink.png</file>
+        <file>res/logout.png</file>
+        <file>res/add-user.png</file>
+    </qresource>
+</RCC>
