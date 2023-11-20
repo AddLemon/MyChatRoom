@@ -50,7 +50,7 @@ bool Server::receive(Socket* sockPtr, Json::Value& deserialized_pkt)
 void Server::send(string id, Json::Value pkt)
 {
 	Json::StyledWriter sw;			//test ********************
-	cout << endl << "server send: " << endl << sw.write(pkt) << endl;	//test ********************
+	cout << endl << "Server send: " << endl << sw.write(pkt) << endl;	//test ********************
 	//serialize
 	string serialized_pkt = serialize(pkt);
 
@@ -67,6 +67,10 @@ string Server::serialize(Json::Value pkt)
 {
 	Json::FastWriter writer;
 	string str = writer.write(pkt);
+	// remove '\n' at the end of string
+	if (!str.empty() && str.back() == '\n') {
+		str.pop_back();
+	}
 	return str;
 }
 
@@ -113,11 +117,11 @@ Json::Value Server::dealLogin(string& tmpID, string userID, string password)
 		bool a = m_database->queryUserPassword(userID, result);
 		if (a && password == result) {
 			//query data from database
-			string db_userName;
+			UserInfo db_userInfo;
 			vector<pair<string, string>> db_friends;
 			vector<pair<string, string>> db_groups;
 
-			m_database->queryUserName(userID, db_userName);
+			m_database->queryUser(userID, db_userInfo);
 			m_database->queryFriendList(userID, db_friends);
 			m_database->queryGroupList(userID, db_groups);
 
@@ -127,7 +131,9 @@ Json::Value Server::dealLogin(string& tmpID, string userID, string password)
 			Json::Value friends;
 			Json::Value groups;
 
-			userInfo["userName"] = db_userName;
+			userInfo["userID"] = db_userInfo.userID;
+			userInfo["userName"] = db_userInfo.userName;
+			userInfo["password"] = db_userInfo.password;
 
 			for (const auto& pair : db_friends) {
 				Json::Value jsonObj;
@@ -402,6 +408,7 @@ Json::Value Server::dealGetMembers(int groupID)
 			members.append(jsonObj);
 		}
 
+		data["groupID"] = groupID;
 		data["members"] = members;
 
 		new_message["status"] = true;

@@ -21,7 +21,7 @@ int main()
 		//accept connection
 		Socket* s = acceptor.createSocket();
 		acceptor.accept(s);
-		cout << "connected!" << endl;
+		cout << "Address: " << s->getRemoteAddress() << " connected!" << endl;
 		
 		//sub thread
 		thread myThread([&, tmp, s]() {
@@ -33,26 +33,28 @@ int main()
 			//Json::Value jsonpkt;
 			//jsonpkt["header"]["requestID"] = 123456789;
 			//jsonpkt["header"]["type"] = static_cast<int>(ClientMsgType::REGISTER_UP);
-			//jsonpkt["header"]["senderID"] = "123456";
-			//jsonpkt["message"]["userID"] = "123456";
-			//jsonpkt["message"]["userName"] = "Alex";
-			//jsonpkt["message"]["password"] = "alex123456";
+			//jsonpkt["header"]["senderID"] = "222222";
+			//jsonpkt["message"]["userID"] = "222222";
+			//jsonpkt["message"]["userName"] = "Cat";
+			//jsonpkt["message"]["password"] = "cat123456";
 			//disp->dispatch(jsonpkt);
-
+			
+			//server->getSocket(tmpID)->write("alex");	//test
+			
 			//receive
 			while (true) {
 				//receive packet
 				string str;
 				int result = s->read(str);	
 				//bool result = server->receive(s, );
-				if (result == 2) {
+				if (result != 1) {
 					//server->disConnect;
-					cout << "disconnected..." << endl;
-					//TODO change to temp id
+					cout << "Address: " << s->getRemoteAddress() << " disconnected..." << endl;
+					break;
 				}
-				else if (result == 0) {
+				/*else if (result == 0) {
 						cout << "receive error.." << endl;
-				}
+				}*/
 
 				Json::Value pkt = server->deserialize(str);
 

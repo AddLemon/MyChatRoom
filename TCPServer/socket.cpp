@@ -4,7 +4,6 @@
 Socket::Socket(asio::io_context* io)	//tcp::socket* socket
 {
 	m_socket = new tcp::socket(*io);
-	//m_socket = socket;
 }
 
 Socket::~Socket()
@@ -34,7 +33,7 @@ int Socket::read(string& pkt)
 	}
 	else if (error) {
 		// 发生其他错误
-		cout << "Error: " << error << " - " << error.message() << endl;
+		cout << "Read error: " << error << " - " << error.message() << endl;
 		return 0;
 	}
 
@@ -49,12 +48,20 @@ void Socket::write(string pkt)
 	unique_lock<mutex> lock(m_mutex);
 	cout << "send string:" << endl << pkt << endl;	//test ********************
 	//send packet
-	try {
-		m_socket->send(asio::buffer(pkt));
+	system::error_code error;
+	//asio::write(m_socket, asio::buffer(pkt), error);
+	size_t size = m_socket->send(asio::buffer(pkt), 0, error);
+	cout << "send size: " << size << endl;
+	if (error) {
+		cout << "Send error: " << error << " - " << error.message() << endl;
 	}
-	catch (std::exception& e) {
-		cerr << e.what() << endl;
-	}
+}
+
+string Socket::getRemoteAddress()
+{
+	tcp::endpoint remote_ep = m_socket->remote_endpoint();
+	asio::ip::address remote_ad = remote_ep.address();
+	return remote_ad.to_string();
 }
 
 void Socket::close()

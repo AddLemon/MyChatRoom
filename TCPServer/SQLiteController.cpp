@@ -603,7 +603,11 @@ bool SqliteController::queryFriendList(const string& userID, vector<pair<string,
 		//user exist
 		string userID = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
 		string userName;
+
+		lock.unlock();
 		queryUserName(userID, userName);
+		lock.lock();
+
 		result.push_back(pair(userID, userName));
 	}
 
@@ -640,7 +644,11 @@ bool SqliteController::queryGroupList(const string& userID, vector<pair<string, 
 		//user exist
 		string groupID = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
 		string groupName;
+
+		lock.unlock();
 		queryUserName(groupID, groupName);
+		lock.lock();
+
 		result.push_back(pair(groupID, groupName));
 	}
 
@@ -769,6 +777,7 @@ bool SqliteController::queryGroupMembers(const int& groupID, vector<pair<string,
 
 bool SqliteController::isGroupOwner(const string& userID, const int& groupID)
 {
+	//TODO
 	return false;
 }
 

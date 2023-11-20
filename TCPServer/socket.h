@@ -20,7 +20,7 @@ public:
 	/// <returns> 1: run successful. 0: failed to read. 2: socket disconnected</returns>
 	int read(string& pkt);
 	void write(string pkt);
-private:
+	string getRemoteAddress();
 	void close();
 	void shutdown();
 private:

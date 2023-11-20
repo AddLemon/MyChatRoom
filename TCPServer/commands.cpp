@@ -27,6 +27,10 @@ void Command::addCheckSum(Json::Value& pkt)
     int checkSum = 0;
     Json::FastWriter w;
     string str = w.write(pkt);
+    // remove '\n' at the end of string
+    if (!str.empty() && str.back() == '\n') {
+        str.pop_back();
+    }
     for (char i : str) {
         checkSum += static_cast<unsigned char>(i);
     }
@@ -154,7 +158,6 @@ void MdfyGrpInfoCommand::execute()
 void GpChatCommand::execute()
 {
     Json::Value msg = m_server->dealGroupChat(m_senderID, m_groupID, m_content, m_timestamp, m_online_members);
-    m_reply_pkt["message"] = msg;
     m_forward_pkt["message"] = msg;
 }
 
@@ -167,7 +170,9 @@ void GpChatCommand::send()
     while(m_online_members.size() != 0) {
         string id = m_online_members.front();
         m_online_members.pop();
-        m_server->send(id, m_forward_pkt);
+        if (m_senderID != id) {
+            m_server->send(id, m_forward_pkt);
+        }
     }
 }
 
@@ -188,7 +193,6 @@ void GpChatCommand::addHeader()
 void PvChatCommand::execute()
 {
     Json::Value msg = m_server->dealPrivateChat(m_senderID, m_receiverID, m_content, m_timestamp, isOL);
-    m_reply_pkt["message"] = msg;
     m_forward_pkt["message"] = msg;
 }
 
