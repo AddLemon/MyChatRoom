@@ -5,8 +5,6 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TCPServer", "TCPServer\TCPServer.vcxproj", "{3820509F-4A68-427B-BBB9-E13DD449E9F1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TCPClient", "TCPClient\TCPClient.vcxproj", "{38C1E9B6-7629-42E1-924B-0765FB9E9B32}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -23,14 +21,6 @@ Global
 		{3820509F-4A68-427B-BBB9-E13DD449E9F1}.Release|x64.Build.0 = Release|x64
 		{3820509F-4A68-427B-BBB9-E13DD449E9F1}.Release|x86.ActiveCfg = Release|Win32
 		{3820509F-4A68-427B-BBB9-E13DD449E9F1}.Release|x86.Build.0 = Release|Win32
-		{38C1E9B6-7629-42E1-924B-0765FB9E9B32}.Debug|x64.ActiveCfg = Debug|x64
-		{38C1E9B6-7629-42E1-924B-0765FB9E9B32}.Debug|x64.Build.0 = Debug|x64
-		{38C1E9B6-7629-42E1-924B-0765FB9E9B32}.Debug|x86.ActiveCfg = Debug|Win32
-		{38C1E9B6-7629-42E1-924B-0765FB9E9B32}.Debug|x86.Build.0 = Debug|Win32
-		{38C1E9B6-7629-42E1-924B-0765FB9E9B32}.Release|x64.ActiveCfg = Release|x64
-		{38C1E9B6-7629-42E1-924B-0765FB9E9B32}.Release|x64.Build.0 = Release|x64
-		{38C1E9B6-7629-42E1-924B-0765FB9E9B32}.Release|x86.ActiveCfg = Release|Win32
-		{38C1E9B6-7629-42E1-924B-0765FB9E9B32}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

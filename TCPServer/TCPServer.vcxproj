@@ -104,10 +104,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\libsodium\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\libsodium\x64\Debug\v143\dynamic</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libsodium.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -127,11 +131,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="commands.cpp" />
+    <ClCompile Include="dispatcher.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="public.cpp" />
+    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="acceptor.cpp" />
+    <ClCompile Include="socket.cpp" />
+    <ClCompile Include="sodiumencryptor.cpp" />
+    <ClCompile Include="sqlite3.c" />
+    <ClCompile Include="SQLiteController.cpp" />
+    <ClCompile Include="TaskQueue.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="commands.h" />
+    <ClInclude Include="dispatcher.h" />
     <ClInclude Include="public.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="acceptor.h" />
+    <ClInclude Include="socket.h" />
+    <ClInclude Include="sodiumencryptor.h" />
+    <ClInclude Include="sqlite3.h" />
+    <ClInclude Include="SQLiteController.h" />
+    <ClInclude Include="TaskQueue.h" />
+    <ClInclude Include="ThreadPool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

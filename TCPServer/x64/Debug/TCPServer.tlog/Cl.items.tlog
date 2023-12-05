@@ -1,0 +1,11 @@
+D:\MyWork_CPP\MyChatRoom\TCPServer\commands.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\commands.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\dispatcher.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\dispatcher.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\main.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\main.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\Server.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\Server.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\acceptor.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\acceptor.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\socket.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\socket.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\sodiumencryptor.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\sodiumencryptor.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\sqlite3.c;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\sqlite3.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\SQLiteController.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\SQLiteController.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\TaskQueue.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\TaskQueue.obj
+D:\MyWork_CPP\MyChatRoom\TCPServer\ThreadPool.cpp;D:\MyWork_CPP\MyChatRoom\TCPServer\x64\Debug\ThreadPool.obj
