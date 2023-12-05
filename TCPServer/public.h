@@ -1,36 +1,44 @@
 #pragma once
-#include <iostream>
-#include <string>
-#include <boost/asio.hpp>
-using namespace std;
-using namespace boost;
-using asio::ip::tcp;
 
-typedef std::shared_ptr<tcp::socket> SockPtr;
+#define PACKET_CAPACITY 300
 
-/// <summary>
-/// Deal with client`s requirements in thread
-/// </summary>
-/// <param name="sockPtr">A pointer of the socket connected to current client</param>
-void dealClient(SockPtr sockPtr);
+enum class ServerMsgType {
+	SERVER_REPLY_REGISTER_UP,
+	SERVER_REPLY_LOG_IN,
+	SERVER_REPLY_MODIFY_USER_INFO,
+	SERVER_REPLY_FIND_USER,
+	SERVER_REPLY_ADD_FRIEND,
+	SERVER_REPLY_REMOVE_FRIEND,
+	SERVER_REPLY_FIND_GROUP,
+	SERVER_REPLY_ADD_GROUP,
+	SERVER_REPLY_REMOVE_GROUP,
+	SERVER_REPLY_GET_GROUP_MEMBERS,
+	SERVER_REPLY_CREATE_GROUP,
+	SERVER_REPLY_MODIFY_GROUP_INFO,
+	SERVER_REPLY_PRIVATE_CHAT,
+	SERVER_REPLY_GROUP_CHAT,
+	SERVER_NOTICE_NEW_FRIEND,
+	SERVER_NOTICE_REMOVE_FRIEND,
+	SERVER_NOTICE_RENEW_STATUS,
+	SERVER_FORWARD_PRIVATE_CHAT,
+	SERVER_FORWARD_GROUP_CHAT,
+	
+};
 
-/// <summary>
-/// Receive message from client and save in the input container. Return true when successful, else return false.
-/// </summary>
-/// <param name="sockPtr">A pointer of the socket connected to current client</param>
-/// <param name="msg">A container for saving message</param>
-/// <returns>Return true when receive successfully, else return false.</returns>
-bool recvMsg(SockPtr sockPtr, string& msg);
-
-/// <summary>
-///	Send message to the server. Return true when successful, else return false.
-/// </summary>
-/// <param name="sockPtr">A pointer of the socket connected to server</param>
-/// <param name="msg">A container saving message</param>
-/// <returns>Return true when send successfully, else return false.</returns>
-bool sendMsg(SockPtr sockPtr, const string& msg);
-
-#ifdef _WIN32
-//UTF-8×ªÕ­×Ö·û´®
-string U8toA(const string& s);
-#endif
+enum class ClientMsgType {
+	REGISTER_UP,
+	LOG_IN,
+	MODIFY_USER_INFO,
+	FIND_USER,
+	ADD_FRIEND,
+	REMOVE_FRIEND,
+	FIND_GROUP,
+	ADD_GROUP,
+	REMOVE_GROUP,
+	GET_GROUP_MEMBERS,
+	CREATE_GROUP,
+	MODIFY_GROUP_INFO,
+	PRIVATE_CHAT,
+	GROUP_CHAT,
+	LOG_OFF
+};
