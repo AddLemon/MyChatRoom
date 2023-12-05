@@ -59,15 +59,6 @@ MainWindow::MainWindow(QWidget *parent)
                         rmvFrndCommand* cmd = new rmvFrndCommand(id);
                         QThreadPool* tpool = QThreadPool::globalInstance();
                         tpool->start(cmd);
-
-                        //                QString id = index.data(CustomRoles::idRole).toString();
-                        //                //从model中移除对应的item
-                        //                m_friendsModel->remove(id);
-                        //                //从map中移除id和窗口的映射
-                        //                if(m_activeFriends.contains(id)){
-                        //                    m_activeFriends[id]->deleteLater();
-                        //                    m_activeFriends.remove(id);
-                        //                }
                     }
                 });
 
@@ -83,6 +74,12 @@ MainWindow::MainWindow(QWidget *parent)
     //连接服务器
     m_socket = new Socket(this);
     connect(m_client, &Client::readySend, m_socket, &Socket::write);
+    connect(m_socket, &Socket::disconnected, this, [=](){
+        QMessageBox::critical(this, "Disconnected", "Server disconnected..");
+    });
+    connect(m_socket, &Socket::failInitEncry, this, [=](){
+        QMessageBox::warning(ui_login, "Failed", "Failed to init encryptor, please restart..");
+    });
 
     //接收服务器消息
     m_recvPcsThread = new QThread(this);
@@ -114,7 +111,29 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+//    //send log off signal
+//    logOffCommand* cmd = new logOffCommand();
+//    QThreadPool* tpool = QThreadPool::globalInstance();
+//    tpool->start(cmd);
+//    tpool->waitForDone(100);
+
+    //ui
     ui_login->deleteLater();
+    ui_add->deleteLater();
+    ui_new->deleteLater();
+    ui_add = nullptr;
+    ui_new = nullptr;
+    qDeleteAll(m_activePrivateChats);
+    qDeleteAll(m_activeGroupChats);
+    m_activePrivateChats.clear();
+    m_activeGroupChats.clear();
+    //data
+    m_self = nullptr;
+    m_friendsModel = nullptr;
+    m_groupsModel = nullptr;
+    //view deconnect model
+    ui->fdListView->setModel(nullptr);
+    ui->gpListView->setModel(nullptr);
     delete ui;
 }
 
@@ -156,8 +175,6 @@ void MainWindow::restart()
     m_self = m_client->m_self;
     m_friendsModel = m_client->m_friendsModel;
     m_groupsModel = m_client->m_groupsModel;
-    m_friendsModel->init(); //test
-    m_groupsModel->init();  //test
     //bind model and delegate for the view
     ui->fdListView->setModel(m_friendsModel->getModel());
     ui->gpListView->setModel(m_groupsModel->getModel());
@@ -171,16 +188,21 @@ void MainWindow::onFdListClicked(const QModelIndex &index)
     QString id = index.data(CustomRoles::idRole).toString();
     if(m_activePrivateChats.contains(id)){
         m_activePrivateChats[id]->show();
-        //m_activePrivateChats[id]->activateWindow();
+        m_friendsModel->changeWindowStatus(id, true);   //改变model中的窗口状态为true
+        m_friendsModel->clearMsgNumber(id);         //清空model中的未读消息数
     }
     else{
         PrivateChat* ui_pvChat = new PrivateChat(index.data(idRole).toString(), this);
         connect(m_recvManager, &RecvManager::newPrivateMsg, ui_pvChat, &PrivateChat::showNewMsg);   //recv new msg
+        connect(ui_pvChat, &PrivateChat::rejected, this, [=](){
+            m_friendsModel->changeWindowStatus(id, false);   //改变model中的窗口状态为false
+        });
 
         ui_pvChat->setObjectName(id);               //bind id with chatWindow
         m_recvManager->newActiveWindow(id);         //recvManager record
         m_activePrivateChats.insert(id, ui_pvChat); //mainwindow record
-
+        m_friendsModel->changeWindowStatus(id, true);   //改变model中的窗口状态为true
+        m_friendsModel->clearMsgNumber(id);         //清空model中的未读消息数
         ui_pvChat->show();
     }
 }
@@ -190,16 +212,21 @@ void MainWindow::onGpListClicked(const QModelIndex &index)
     int id = index.data(CustomRoles::idRole).toInt();
     if(m_activeGroupChats.contains(id)){
         m_activeGroupChats[id]->show();
-        //m_activeGroupChats[id]->activateWindow();
+        m_groupsModel->changeWindowStatus(id, true);   //改变model中的窗口状态为true
+        m_groupsModel->clearMsgNumber(id);         //清空model中的未读消息数
     }
     else{
         GroupChat* ui_gpChat = new GroupChat(index.data(idRole).toInt(), this);
         connect(m_recvManager, &RecvManager::newGroupMsg, ui_gpChat, &GroupChat::showNewMsg);   //recv new msg
+        connect(ui_gpChat, &GroupChat::rejected, this, [=](){
+            m_groupsModel->changeWindowStatus(id, false);   //改变model中的窗口状态为false
+        });
 
         ui_gpChat->setObjectName(QString::number(id));  //bind id with chatWindow
         m_recvManager->newActiveWindow(id);             //recvManager record
         m_activeGroupChats.insert(id, ui_gpChat);       //mainwindow record
-
+        m_groupsModel->changeWindowStatus(id, true);   //改变model中的窗口状态为true
+        m_groupsModel->clearMsgNumber(id);         //清空model中的未读消息数
         ui_gpChat->show();
     }
 }
@@ -242,6 +269,9 @@ void MainWindow::on_actioncreate_group_triggered()
 
 void MainWindow::on_action_Logout_triggered()
 {
+    logOffCommand* cmd = new logOffCommand();
+    QThreadPool* tpool = QThreadPool::globalInstance();
+    tpool->start(cmd);
     restart();
 }
 

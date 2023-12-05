@@ -16,8 +16,13 @@ public:
 
     void init();
     void load(QList<User> friends);
-    void add(QString id, QString name);
+    void add(User user);
     void remove(QString id);
+    void renewStatus(QString id, bool status);
+    void changeWindowStatus(QString id, bool status);
+    bool getWindowStatus(QString id);
+    void addMsgNumber(QString id);
+    void clearMsgNumber(QString id);
     QStandardItem* searchItem(QString id);
     QString searchName(QString id);
 

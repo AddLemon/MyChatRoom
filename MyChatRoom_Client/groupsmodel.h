@@ -15,8 +15,12 @@ public:
 
     void init();
     void load(QList<Group> groups);
-    void add(int id, QString name);
+    void add(Group group);
     void remove(int id);
+    void changeWindowStatus(int id, bool status);
+    bool getWindowStatus(int id);
+    void addMsgNumber(int id);
+    void clearMsgNumber(int id);
     QStandardItem* searchItem(int id);
     QString searchName(int id);
 

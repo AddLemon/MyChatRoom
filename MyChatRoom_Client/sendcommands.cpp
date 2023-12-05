@@ -140,3 +140,12 @@ void gpChatCommand::addHeader()
     header.insert("groupID", m_groupID);
     pkt.insert("header", header);   //insert to send packet
 }
+
+void logOffCommand::run()
+{
+    QJsonObject message = QJsonObject();
+    pkt.insert("message", message);   //insert to send packet
+    addHeader();
+    addCheckSum();
+    send();
+}

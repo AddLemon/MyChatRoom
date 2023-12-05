@@ -43,12 +43,12 @@ void GroupsModel::load(QList<Group> groups)
     }
 }
 
-void GroupsModel::add(int id, QString name)
+void GroupsModel::add(Group group)
 {
     QStandardItem* item = new QStandardItem();
     item->setData(QIcon(":/res/peoples-two.png"), Qt::DecorationRole);
-    item->setData(id, CustomRoles::idRole);
-    item->setData(name, CustomRoles::nameRole);
+    item->setData(group.id, CustomRoles::idRole);
+    item->setData(group.name, CustomRoles::nameRole);
     item->setEditable(false);
     m_model->appendRow(item);
 }
@@ -60,6 +60,31 @@ void GroupsModel::remove(int id)
         return; //or messageBox
     }
     m_model->removeRow(item->row());
+}
+
+void GroupsModel::changeWindowStatus(int id, bool status)
+{
+    QStandardItem* item = searchItem(id);
+    item->setData(QVariant(status), CustomRoles::winStatusRole);
+}
+
+bool GroupsModel::getWindowStatus(int id)
+{
+    QStandardItem* item = searchItem(id);
+    return item->data(CustomRoles::winStatusRole).toBool();
+}
+
+void GroupsModel::addMsgNumber(int id)
+{
+    QStandardItem* item = searchItem(id);
+    int i = item->data(CustomRoles::msgNumberRole).toInt();
+    item->setData(QVariant(++i), CustomRoles::msgNumberRole);
+}
+
+void GroupsModel::clearMsgNumber(int id)
+{
+    QStandardItem* item = searchItem(id);
+    item->setData(QVariant(0), CustomRoles::msgNumberRole);
 }
 
 QStandardItem *GroupsModel::searchItem(int id)

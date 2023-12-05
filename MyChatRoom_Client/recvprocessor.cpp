@@ -149,6 +149,12 @@ void RecvProcessor::process(QByteArray pkt)
         tpool->start(notice);
         break;
     }
+    case RecvType::SERVER_NOTICE_RENEW_STATUS:
+    {
+        NoticeStatusCommand* notice = new NoticeStatusCommand(pkt_obj);
+        tpool->start(notice);
+        break;
+    }
     case RecvType::SERVER_FORWARD_PRIVATE_CHAT:
     {
         ForwardPrcsCommand* notice = new ForwardPrcsCommand(pkt_obj);

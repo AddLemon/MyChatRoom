@@ -115,18 +115,23 @@ void Client::onLogIn(SelfInfo userInfo, QList<User> friends, QList<Group> groups
     m_self->init(userInfo.userID, userInfo.userName, userInfo.password);
 
     for(QList<User>::iterator i = friends.begin(); i != friends.end(); ++i){
-        m_friendsModel->add(i->id, i->name);
+        User user = *i;
+        m_friendsModel->add(user);
     }
 
     for(QList<Group>::iterator i = groups.begin(); i != groups.end(); ++i){
-        m_groupsModel->add(i->id, i->name);
+        Group group = *i;
+        m_groupsModel->add(group);
     }
     emit loginSuccessful();
 }
 
 void Client::onNewFriend(QString id, QString name)
 {
-    m_friendsModel->add(id, name);
+    User user;
+    user.id = id;
+    user.name = name;
+    m_friendsModel->add(user);
     emit addFriendSuccessful();
 }
 
@@ -138,7 +143,10 @@ void Client::onRemoveFriend(QString id)
 
 void Client::onNewGroup(int id, QString name)
 {
-    m_groupsModel->add(id, name);
+    Group group;
+    group.id = id;
+    group.name = name;
+    m_groupsModel->add(group);
     emit addGroupSuccessful();
 }
 
@@ -164,6 +172,31 @@ void Client::onNewMembers(int groupID, QList<User> members)
         mModel->load(members);
         m_membersModelMap.insert(groupID, mModel);  //记录创建的model
         emit getMembersSuccessful();    //发送信号通知窗口
+    }
+}
+
+void Client::onNewStatus(QString id, bool status)
+{
+    m_friendsModel->renewStatus(id, status);
+}
+
+void Client::onNewPrivateMsg(QString friendID, Message msg)
+{
+    emit newPrivateMsg(friendID, msg);
+    bool opened = m_friendsModel->getWindowStatus(friendID);
+    if(!opened){
+        //窗口没有显示
+        m_friendsModel->addMsgNumber(friendID); //累加未读消息数
+    }
+}
+
+void Client::onNewGroupMsg(int groupID, Message msg)
+{
+    emit newGroupMsg(groupID, msg);
+    bool opened = m_groupsModel->getWindowStatus(groupID);
+    if(!opened){
+        //窗口没有显示
+        m_groupsModel->addMsgNumber(groupID); //累加未读消息数
     }
 }
 

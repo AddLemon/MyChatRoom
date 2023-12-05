@@ -42,17 +42,23 @@ void FriendsModel::load(QList<User> friends)
         }
         item->setData(m.id, CustomRoles::idRole);
         item->setData(m.name, CustomRoles::nameRole);
+        item->setData(m.status, CustomRoles::statusRole);
+        item->setData(false, CustomRoles::winStatusRole);
+        item->setData(0, CustomRoles::msgNumberRole);
         item->setEditable(false);
         m_model->appendRow(item);
     }
 }
 
-void FriendsModel::add(QString id, QString name)
+void FriendsModel::add(User user)
 {
     QStandardItem* item = new QStandardItem();
     item->setData(QIcon(":/res/avatar.png"), Qt::DecorationRole);
-    item->setData(id, CustomRoles::idRole);
-    item->setData(name, CustomRoles::nameRole);
+    item->setData(user.id, CustomRoles::idRole);
+    item->setData(user.name, CustomRoles::nameRole);
+    item->setData(user.status, CustomRoles::statusRole);
+    item->setData(false, CustomRoles::winStatusRole);
+    item->setData(0, CustomRoles::msgNumberRole);
     item->setEditable(false);
     m_model->appendRow(item);
 }
@@ -64,6 +70,38 @@ void FriendsModel::remove(QString id)
         return; //or messageBox
     }
     m_model->removeRow(item->row());
+}
+
+void FriendsModel::renewStatus(QString id, bool status)
+{
+    QStandardItem* item = searchItem(id);
+    item->setData(QVariant(status), CustomRoles::statusRole);
+    //emit m_model->dataChanged(item->index(), item->index(), {CustomRoles::statusRole});
+}
+
+void FriendsModel::changeWindowStatus(QString id, bool status)
+{
+    QStandardItem* item = searchItem(id);
+    item->setData(QVariant(status), CustomRoles::winStatusRole);
+}
+
+bool FriendsModel::getWindowStatus(QString id)
+{
+    QStandardItem* item = searchItem(id);
+    return item->data(CustomRoles::winStatusRole).toBool();
+}
+
+void FriendsModel::addMsgNumber(QString id)
+{
+    QStandardItem* item = searchItem(id);
+    int i = item->data(CustomRoles::msgNumberRole).toInt();
+    item->setData(QVariant(++i), CustomRoles::msgNumberRole);
+}
+
+void FriendsModel::clearMsgNumber(QString id)
+{
+    QStandardItem* item = searchItem(id);
+    item->setData(QVariant(0), CustomRoles::msgNumberRole);
 }
 
 QStandardItem *FriendsModel::searchItem(QString id)

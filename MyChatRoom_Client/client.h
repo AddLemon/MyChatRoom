@@ -52,6 +52,9 @@ public:
     void onNewGroup(int id, QString name);
     void onRemoveGroup(int id);
     void onNewMembers(int groupID, QList<User> members);    //接收到成员列表后调用此方法将数据更新到model
+    void onNewStatus(QString id, bool status);
+    void onNewPrivateMsg(QString friendID, Message msg);
+    void onNewGroupMsg(int groupID, Message msg);
 
 //    size_t getSizeFdList();
 //    size_t getSizeGpList();

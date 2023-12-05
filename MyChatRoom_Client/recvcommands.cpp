@@ -57,6 +57,7 @@ ReplyLogInCommand::ReplyLogInCommand(QJsonObject pkt, QObject *parent)
                 User user;
                 user.id = obj["userID"].toString();
                 user.name = obj["userName"].toString();
+                user.status = obj["status"].toBool();
 
                 // 将键值对添加到 QVector
                 m_friends.append(user);
@@ -306,6 +307,7 @@ void ReplyCrtGrpCommand::run()
 {
     if (m_status == true) {
         emit crtGroupSuccessful(m_groupID, m_groupName);
+        emit m_client->crtGroupSuccessful(m_groupID, m_groupName);
     } else {
         emit m_client->crtGroupFailed(m_reason);
     }
@@ -383,6 +385,20 @@ void NoticePrcsCommand::run()
     }
 }
 
+NoticeStatusCommand::NoticeStatusCommand(QJsonObject pkt, QObject *parent)
+    : AbstractReception(pkt, parent)
+{
+    m_id = m_message["userID"].toString();
+    m_status = m_message["status"].toBool();
+    //收到好友的新状态，客户端将接收的数据并写入model
+    connect(this, &NoticeStatusCommand::newStatus, m_client, &Client::onNewStatus);
+}
+
+void NoticeStatusCommand::run()
+{
+    emit newStatus(m_id, m_status);
+}
+
 ForwardPrcsCommand::ForwardPrcsCommand(QJsonObject pkt, QObject *parent)
     : AbstractReception(pkt, parent)
 {
@@ -392,9 +408,9 @@ ForwardPrcsCommand::ForwardPrcsCommand(QJsonObject pkt, QObject *parent)
     m_timestamp = m_message["timestamp"].toString();
 
     //收到私聊消息，客户端将接收的数据并写入recvManager
-    connect(this, &ForwardPrcsCommand::newPrivateMsg, m_client, &Client::newPrivateMsg);
+    connect(this, &ForwardPrcsCommand::newPrivateMsg, m_client, &Client::onNewPrivateMsg);
     //收到群聊消息，客户端将接收的数据并写入recvManager
-    connect(this, &ForwardPrcsCommand::newGroupMsg, m_client, &Client::newGroupMsg);
+    connect(this, &ForwardPrcsCommand::newGroupMsg, m_client, &Client::onNewGroupMsg);
 }
 
 void ForwardPrcsCommand::run()
@@ -409,3 +425,5 @@ void ForwardPrcsCommand::run()
     }
 }
 #endif //test
+
+

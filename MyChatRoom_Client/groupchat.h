@@ -23,6 +23,8 @@ public:
 
     void showNewMsg(int id, Message msg);
 
+    bool loadedMembers();
+
 private slots:
     void on_frshBtn_clicked();  //刷新成员列表
 
@@ -34,6 +36,7 @@ private:
     Client* m_client;
     int m_groupID;
     MembersModel* m_members;  //储存成员列表的model
+    QEventLoop loop;
 };
 
 #endif // GROUPCHAT_H

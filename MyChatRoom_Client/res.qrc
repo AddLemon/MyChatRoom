@@ -28,5 +28,7 @@
         <file>res/unlink.png</file>
         <file>res/logout.png</file>
         <file>res/add-user.png</file>
+        <file>res/green.png</file>
+        <file>res/red.jpg</file>
     </qresource>
 </RCC>

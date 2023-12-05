@@ -27,20 +27,23 @@ void MembersModel::init()
 void MembersModel::load(QList<User> members)
 {
     m_model->clear();
-    for(int i=0; i<members.size(); i++){
-        User m = members.first();
+    //for(User i : members){
+    for(int a=0; a<=members.size(); a++){
+        User i = members.first();
         members.pop_front();
+
         QStandardItem* item = new QStandardItem();
-        if(m.avatar.isNull()){
+        if(i.avatar.isNull()){
             item->setData(QIcon(":/res/avatar.png"), Qt::DecorationRole);
         }
         else{
-            item->setData(QIcon(m.avatar), Qt::DecorationRole);
+            item->setData(QIcon(i.avatar), Qt::DecorationRole);
         }
-        item->setData(m.id, CustomRoles::idRole);
-        item->setData(m.name, CustomRoles::nameRole);
+        item->setData(i.id, CustomRoles::idRole);
+        item->setData(i.name, CustomRoles::nameRole);
         item->setEditable(false);
         m_model->appendRow(item);
+        qDebug() << "group member: " << item->data(CustomRoles::nameRole).toString();
     }
 }
 

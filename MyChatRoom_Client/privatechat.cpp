@@ -34,6 +34,16 @@ void PrivateChat::showNewMsg(QString id, Message msg)
     }
 }
 
+void PrivateChat::showStatus(bool isOnline)
+{
+    if(isOnline){
+        ui->msgBrowser->append("<div style='text-align: center;'><font color='gray'>---"+m_receiverName+"is online---</font></div>");
+    }
+    else{
+        ui->msgBrowser->append("<div style='text-align: center;'><font color='gray'>---"+m_receiverName+"is offline---</font></div>");
+    }
+}
+
 void PrivateChat::on_sendBtn_clicked()
 {
     if(ui->msgTxtEdit->document()->isEmpty()){
@@ -46,12 +56,14 @@ void PrivateChat::on_sendBtn_clicked()
     QDateTime currentTime = QDateTime::currentDateTime();
     // 获取时间戳
     qint64 timestamp = currentTime.toSecsSinceEpoch();
+    QString dateTimeStr = QDateTime::fromSecsSinceEpoch(timestamp).toString("yyyy-MM-dd HH:mm:ss");
     QString timestampStr = QString::number(timestamp);
 
     pvChatCommand* cmd = new pvChatCommand(m_receiverID, content, timestampStr);
     QThreadPool* tpool = QThreadPool::globalInstance();
     tpool->start(cmd);
-
+    ui->msgBrowser->append("[Me]"+dateTimeStr);
+    ui->msgBrowser->append(content);
 //    //test
 //    Message a;
 //    a.userID = m_senderID;

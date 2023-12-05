@@ -7,6 +7,9 @@
 enum CustomRoles {
     idRole = Qt::UserRole + 1,
     nameRole = Qt::UserRole + 2,
+    statusRole = Qt::UserRole + 3,
+    winStatusRole = Qt::UserRole + 4,
+    msgNumberRole = Qt::UserRole + 5
 };
 
 enum class RecvType {
@@ -26,6 +29,7 @@ enum class RecvType {
     SERVER_REPLY_GROUP_CHAT,
     SERVER_NOTICE_NEW_FRIEND,
     SERVER_NOTICE_REMOVE_FRIEND,
+    SERVER_NOTICE_RENEW_STATUS,
     SERVER_FORWARD_PRIVATE_CHAT,
     SERVER_FORWARD_GROUP_CHAT,
 };
@@ -45,6 +49,7 @@ enum class MsgType {
     MODIFY_GROUP_INFO,
     PRIVATE_CHAT,
     GROUP_CHAT,
+    LOG_OFF
 };
 
 struct SelfInfo {
@@ -64,6 +69,7 @@ struct User{
     QPixmap avatar;
     QString id;
     QString name;
+    bool status;
 };
 
 struct Group{

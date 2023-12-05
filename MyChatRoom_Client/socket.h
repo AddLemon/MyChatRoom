@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 #include <QObject>
 #include <QMutex>
+#include "sodiumencryptor.h"
 
 
 
@@ -18,12 +19,16 @@ public:
     void close();
     void write(QByteArray pkt);
     void read(QByteArray& pkt);
-
+    bool isOpen();
 signals:
     void connected();
+    void disconnected();
     void received(QByteArray pkt);
+    void failInitEncry();
 private:
     QTcpSocket* m_socket = nullptr;
+    SodiumEncryptor* m_encryptor;
+
 };
 
 #endif // SOCKET_H

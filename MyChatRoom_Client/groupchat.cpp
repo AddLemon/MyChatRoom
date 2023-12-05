@@ -18,6 +18,7 @@ GroupChat::GroupChat(int groupID, QWidget *parent) :
     m_members = nullptr;
 
     connect(m_client, &Client::getMembersSuccessful, this, [=](){
+        loop.quit();
         qDebug() << "start set model"; //test
         //bind model and delegate for the view
         m_members = m_client->m_membersModelMap.value(groupID);
@@ -31,10 +32,13 @@ GroupChat::GroupChat(int groupID, QWidget *parent) :
     });
 
     connect(m_client, &Client::getMembersFailed, this, [=](){
+        loop.quit();
         ui->frshLabel->setPixmap(QPixmap(":/res/caution.png").scaled(ui->frshLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     });
 
     getMembers();   //通过客户端向服务器请求获取成员列表
+
+    loop.exec();    //等待列表加载完成
 }
 
 GroupChat::~GroupChat()
@@ -52,15 +56,23 @@ void GroupChat::getMembers()
 void GroupChat::showNewMsg(int id, Message msg)
 {
     if(QString::number(id) == this->objectName()){
-        QString receiverName = m_members->searchName(msg.userID);
+        QString senderName = m_members->searchName(msg.userID);
         //时间戳转换
         QDateTime dateTime = QDateTime::fromSecsSinceEpoch(msg.timestamp.toLongLong());
         QString dateTimeStr = dateTime.toString("yyyy-MM-dd HH:mm:ss");
 
         //qDebug() << "Formatted DateTime:" << formattedDateTime;
-        ui->msgBrowser->append("["+receiverName+"]"+dateTimeStr);
+        ui->msgBrowser->append("["+senderName+"]"+dateTimeStr);
         ui->msgBrowser->append(msg.content);
     }
+}
+
+bool GroupChat::loadedMembers()
+{
+    if(m_members == nullptr){
+        return false;
+    }
+    return true;
 }
 
 void GroupChat::on_frshBtn_clicked()
@@ -80,12 +92,15 @@ void GroupChat::on_sendBtn_clicked()
     QDateTime currentTime = QDateTime::currentDateTime();
     // 获取时间戳
     qint64 timestamp = currentTime.toSecsSinceEpoch();
+    QString dateTimeStr = QDateTime::fromSecsSinceEpoch(timestamp).toString("yyyy-MM-dd HH:mm:ss");
     QString timestampStr = QString::number(timestamp);
 
     gpChatCommand* cmd = new gpChatCommand(m_groupID, content, timestampStr);
     QThreadPool* tpool = QThreadPool::globalInstance();
     tpool->start(cmd);
 
+    ui->msgBrowser->append("[Me]"+dateTimeStr);
+    ui->msgBrowser->append(content);
 //        //test
 //        Message a;
 //        a.userID = "id1";

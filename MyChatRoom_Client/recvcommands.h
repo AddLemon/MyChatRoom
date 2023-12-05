@@ -208,6 +208,19 @@ private:
     QString m_name;
 };
 
+class NoticeStatusCommand : public AbstractReception
+{
+    Q_OBJECT
+public:
+    NoticeStatusCommand(QJsonObject pkt, QObject *parent = nullptr);
+    void run() override;
+signals:
+    void newStatus(QString id, bool status);
+private:
+    QString m_id;
+    bool m_status;
+};
+
 class ForwardPrcsCommand : public AbstractReception
 {
     Q_OBJECT

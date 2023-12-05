@@ -2,7 +2,10 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17 console
+CONFIG += c++17 #console
+
+INCLUDEPATH += D:/libsodium/include
+LIBS += -LD:/libsodium/x64/Debug/v143/dynamic -llibsodium
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -11,6 +14,7 @@ CONFIG += c++17 console
 SOURCES += \
     addnew.cpp \
     client.cpp \
+    frienddelegate.cpp \
     friendsmodel.cpp \
     groupchat.cpp \
     groupsmodel.cpp \
@@ -29,11 +33,13 @@ SOURCES += \
     self.cpp \
     sendcommands.cpp \
     setting.cpp \
-    socket.cpp
+    socket.cpp \
+    sodiumencryptor.cpp
 
 HEADERS += \
     addnew.h \
     client.h \
+    frienddelegate.h \
     friendsmodel.h \
     groupchat.h \
     groupsmodel.h \
@@ -52,7 +58,8 @@ HEADERS += \
     self.h \
     sendcommands.h \
     setting.h \
-    socket.h
+    socket.h \
+    sodiumencryptor.h
 
 FORMS += \
     addnew.ui \

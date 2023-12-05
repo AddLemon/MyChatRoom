@@ -19,6 +19,7 @@ public:
     ~PrivateChat();
 
     void showNewMsg(QString id, Message msg);
+    void showStatus(bool isOnline);
 
 protected:
 

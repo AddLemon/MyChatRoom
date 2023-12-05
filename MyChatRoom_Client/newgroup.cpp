@@ -34,9 +34,9 @@ NewGroup::NewGroup(QWidget *parent) :
 
         QPixmap pix = QPixmap(":/res/correct.png").scaled(ui->rstLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
         ui->iconLabel->setPixmap(pix);
-        ui->rstLabel->setText("<font color='green'>Success</font>");
+        ui->rstLabel->setText("<font color='green'>Success! Group ID: "+QString::number(id)+"</font>");
 
-        QMessageBox::information(this, "Information", "Success to create a group: "+name+", group id is"+QString::number(id));
+        //QMessageBox::information(this, "Information", "Success to create a group: "+name+", group id is"+QString::number(id));
     });
 
     //failed to create

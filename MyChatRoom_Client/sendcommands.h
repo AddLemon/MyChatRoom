@@ -238,6 +238,17 @@ private:
     int m_groupID;
 };
 
-
+class logOffCommand : public AbstractRequest
+{
+public:
+    logOffCommand(QObject *parent = nullptr)
+        : AbstractRequest(parent)
+    {
+        type = MsgType::LOG_OFF;
+    };
+public:
+    void run() override;
+protected:
+};
 
 #endif // SENDCOMMANDS_H

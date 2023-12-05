@@ -1,18 +1,18 @@
-#ifndef LISTDELEGATE_H
-#define LISTDELEGATE_H
+#ifndef FRIENDDELEGATE_H
+#define FRIENDDELEGATE_H
 
-#include <QStyledItemDelegate>
 #include <QModelIndex>
 #include <QPainter>
+#include <QStyledItemDelegate>
 
-class listDelegate : public QStyledItemDelegate
+class friendDelegate : public QStyledItemDelegate
 {
 public:
-    explicit listDelegate(QObject *parent = nullptr);
+    friendDelegate(QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
-#endif // LISTDELEGATE_H
+#endif // FRIENDDELEGATE_H

@@ -16,6 +16,16 @@ AddNew::AddNew(QWidget *parent) :
     ui->addGBtn->setEnabled(false); //初始化添加按钮为不可点击
     m_client = Client::getInstance();
 
+    //set add button disenabled when edit
+    connect(ui->userID, &QLineEdit::textEdited, this, [=](){
+        ui->addFBtn->setEnabled(false);
+    });
+
+    //set add button disenabled when edit
+    connect(ui->groupID, &QLineEdit::textEdited, this, [=](){
+        ui->addGBtn->setEnabled(false);
+    });
+
     //get searched user info
     connect(m_client, &Client::findUserSuccessful, this, [&](QString id, QString name){
         loop.quit();
@@ -39,10 +49,16 @@ AddNew::AddNew(QWidget *parent) :
     });
 
     //success to add friend
-    connect(m_client, &Client::addFriendSuccessful, &loop, &QEventLoop::quit);
+    connect(m_client, &Client::addFriendSuccessful, &loop, [=](){
+        loop.quit();
+        QMessageBox::information(this, "Success", "Add friend successfully");
+    });
 
-    //success to add friend
-    connect(m_client, &Client::addGroupSuccessful, &loop, &QEventLoop::quit);
+    //success to add group
+    connect(m_client, &Client::addGroupSuccessful, &loop, [=](){
+        loop.quit();
+        QMessageBox::information(this, "Success", "Add group successfully");
+    });
 
     //failed to search user
     connect(m_client, &Client::findUserFailed, this, [=](QString reason){
