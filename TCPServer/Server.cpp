@@ -4,44 +4,37 @@ Server* Server::m_server = new Server;	//init static member variables
 
 Server::Server()
 {	
-	////init handler map
-	//m_handlerMap[ClientMsgType::REGISTER_UP] = bind(&Server::dealRegister, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::LOG_IN] = bind(&Server::dealLogin, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::MODIFY_USER_INFO] = bind(&Server::dealModifyUserInfo, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::FIND_USER] = bind(&Server::dealFindUser, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::ADD_FRIEND] = bind(&Server::dealAddFriend, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::REMOVE_FRIEND] = bind(&Server::dealRemoveFriend, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::FIND_GROUP] = bind(&Server::dealFindGroup, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::ADD_GROUP] = bind(&Server::dealAddGroup, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::REMOVE_GROUP] = bind(&Server::dealRemoveGroup, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::CREATE_GROUP] = bind(&Server::dealCreateGroup, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::MODIFY_GROUP_INFO] = bind(&Server::dealModifyGroupInfo, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::PRIVATE_CHAT] = bind(&Server::dealPrivateChat, this, std::placeholders::_1);
-	//m_handlerMap[ClientMsgType::GROUP_CHAT] = bind(&Server::dealGroupChat, this, std::placeholders::_1);
-
 	m_database = new SqliteController();
-	//m_threadPool = new ThreadPool();
-	cout << "server init success" << endl;		// test ******************
+	m_encryptor = new SodiumEncryptor();
+	//创建并初始化encryptor
+	if (m_encryptor->init() == 0) {
+		cout << "Server failed to init encryptor, please restart.. " << endl;
+		while (1) {};
+	}
+	m_encryptor->generate_server_keys();		//生成非对称密钥对
+	cout << "Server init success" << endl;		// test ******************
 }
 
 Server::~Server()
 {
 	//delete m_threadPool;
+	delete m_encryptor;
 	delete m_database;
-	for (map<string, Socket*>::iterator i = m_socketMap.begin();
+	for (map<string, ClientSocket>::iterator i = m_socketMap.begin();
 		i != m_socketMap.end(); ++i)
 	{
-		delete i->second;
-		i->second = nullptr;
+		delete i->second.socket;
+		delete i->second.symKey;
 	}
 }
 
-bool Server::receive(Socket* sockPtr, Json::Value& deserialized_pkt)
+bool Server::receive(Socket* sockPtr, Json::Value& deserialized_pkt, const unsigned char* symmetric_key)
 {
-	string pkt;
-	bool a = sockPtr->read(pkt);
-	if (a) {
-		deserialized_pkt = deserialize(pkt);
+	vector<unsigned char> encrypted_message;
+	int a = sockPtr->read(encrypted_message);
+	if (a == 1) {
+		string decrypted_message = m_encryptor->decrypt(symmetric_key, encrypted_message);
+		deserialized_pkt = deserialize(decrypted_message);
 		return true;
 	}
 	return false;
@@ -54,12 +47,16 @@ void Server::send(string id, Json::Value pkt)
 	//serialize
 	string serialized_pkt = serialize(pkt);
 
-	//get socket and write
-	map<string, Socket*>::iterator i = m_socketMap.find(id);
+	//encryption and write
+	map<string, ClientSocket>::iterator i = m_socketMap.find(id);
 	if (i != m_socketMap.end()) {
 		//user is online
-		Socket* sockPtr = i->second;
-		sockPtr->write(serialized_pkt);
+		//get symmetric key and encryption
+		const unsigned char* symmetric_key = i->second.symKey;		
+		vector<unsigned char> encrypted_reply = m_encryptor->encrypt(symmetric_key, serialized_pkt);
+		//get socket and write
+		Socket* sockPtr = i->second.socket;							
+		sockPtr->write(encrypted_reply);
 	}
 }
 
@@ -106,7 +103,7 @@ Json::Value Server::dealRegister(string id, string name, string password)
 	return new_message;
 }
 
-Json::Value Server::dealLogin(string& tmpID, string userID, string password)
+Json::Value Server::dealLogin(string& tmpID, string userID, string password, Json::Value& notice_msg, queue<string>& onlineFriends)
 {	
 	//check if user id is exist
 	Json::Value new_message;
@@ -119,7 +116,7 @@ Json::Value Server::dealLogin(string& tmpID, string userID, string password)
 			//query data from database
 			UserInfo db_userInfo;
 			vector<pair<string, string>> db_friends;
-			vector<pair<string, string>> db_groups;
+			vector<pair<int, string>> db_groups;
 
 			m_database->queryUser(userID, db_userInfo);
 			m_database->queryFriendList(userID, db_friends);
@@ -139,7 +136,12 @@ Json::Value Server::dealLogin(string& tmpID, string userID, string password)
 				Json::Value jsonObj;
 				jsonObj["userID"] = pair.first;
 				jsonObj["userName"] = pair.second;
+				jsonObj["status"] = isOnline(pair.first);
 				friends.append(jsonObj);
+
+				if (isOnline(pair.first)) {
+					onlineFriends.push(pair.first);	//get online friends
+				}
 			}
 
 			for (const auto& pair : db_groups) {
@@ -159,6 +161,9 @@ Json::Value Server::dealLogin(string& tmpID, string userID, string password)
 			//renew senderID and socketMap
 			renewSocketMapKey(tmpID, userID);
 			tmpID = userID;
+
+			notice_msg["userID"] = userID;
+			notice_msg["status"] = true;
 		}
 		else {
 			//password is not correct
@@ -427,7 +432,11 @@ Json::Value Server::dealCreateGroup(string senderID, string groupName)
 {
 	//record to database
 	int groupID;
-	bool a = m_database->insertGroup(groupID, groupName);
+	string userName;
+	bool a = false;
+	a = m_database->queryUserName(senderID, userName);
+	a = m_database->insertGroup(groupID, groupName);
+	a = m_database->insertGroupMember(groupID, senderID, userName);
 
 	//check if success
 	Json::Value new_message;
@@ -444,7 +453,7 @@ Json::Value Server::dealCreateGroup(string senderID, string groupName)
 	else {
 		//not exist
 		new_message["status"] = false;
-		new_message["reason"] = "Failed to leave the group.";
+		new_message["reason"] = "Failed to create the group.";
 	}
 
 	return new_message;
@@ -531,8 +540,27 @@ Json::Value Server::dealGroupChat(string senderID, int groupID, string content, 
 	return new_msg;
 }
 
+void Server::dealLogOff(string userID, Json::Value& notice_msg, queue<string>& onlineFriends)
+{
+	//query data from database
+	vector<pair<string, string>> db_friends;
+
+	m_database->queryFriendList(userID, db_friends);
+
+	for (const auto& pair : db_friends) {
+		if (isOnline(pair.first)) {
+			onlineFriends.push(pair.first);	//get online friends
+		}
+	}
+
+	notice_msg["userID"] = userID;
+	notice_msg["status"] = false;
+}
+
 void Server::renewSocketMapKey(string oldKey, string newKey)
 {
+	//lock
+	unique_lock<mutex> lock(m_mutex);
 	auto it = m_socketMap.find(oldKey);
 	if (it != m_socketMap.end()) {
 		m_socketMap[newKey] = it->second;   // insert new key-value pair
@@ -540,11 +568,12 @@ void Server::renewSocketMapKey(string oldKey, string newKey)
 	}
 }
 
-void Server::newConnect(string id, Socket* sockPtr)
+void Server::newConnect(string id, Socket* sockPtr, const unsigned char* symKey)
 {
 	//lock
 	unique_lock<mutex> lock(m_mutex);
-	m_socketMap.insert(pair<string, Socket*>(id, sockPtr));
+	ClientSocket cs = { sockPtr , symKey };
+	m_socketMap.insert(pair<string, ClientSocket>(id, cs));
 }
 
 void Server::disConnect(string id)
@@ -558,17 +587,30 @@ Socket* Server::getSocket(string id)
 {
 	//lock
 	unique_lock<mutex> lock(m_mutex);
-	return m_socketMap.at(id);
+	return m_socketMap.at(id).socket;
+}
+
+const unsigned char* Server::getSymmetricKey(string id)
+{
+	//lock
+	unique_lock<mutex> lock(m_mutex);
+	return m_socketMap.at(id).symKey;
 }
 
 bool Server::isOnline(string id)
 {
 	//lock
 	unique_lock<mutex> lock(m_mutex);
-	map<string, Socket*>::iterator i = m_socketMap.find(id);
+	map<string, ClientSocket>::iterator i = m_socketMap.find(id);
 	if (i != m_socketMap.end()) {
 		return true;
 	}
 	return false;
 }
+
+SodiumEncryptor* Server::getEncryptor()
+{
+	return m_encryptor;
+}
+
 

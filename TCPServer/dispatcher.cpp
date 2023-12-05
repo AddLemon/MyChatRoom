@@ -128,6 +128,12 @@ void Dispatcher::dispatch(Json::Value pkt)
 		m_threadPool->addTask(cmd);
 		break;
 	}
+	case ClientMsgType::LOG_OFF:
+	{
+		LogOffCommand* cmd = new LogOffCommand(requestID, senderID);
+		m_threadPool->addTask(cmd);
+		break;
+	}
 	default:
 		cout << "Wrong client message type.." << endl;
 	}

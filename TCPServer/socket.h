@@ -18,8 +18,8 @@ public:
 	/// </summary>
 	/// <param name="pkt">the buffer to contain output data</param>
 	/// <returns> 1: run successful. 0: failed to read. 2: socket disconnected</returns>
-	int read(string& pkt);
-	void write(string pkt);
+	int read(vector<unsigned char>& pkt);
+	void write(vector<unsigned char>& pkt);
 	string getRemoteAddress();
 	void close();
 	void shutdown();

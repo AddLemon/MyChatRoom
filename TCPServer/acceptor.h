@@ -20,6 +20,3 @@ public:
 	void accept(Socket* sockPtr);
 	void close();
 };
-
-//asio::io_context Socket_Serv::io;
-//tcp::acceptor Socket_Serv::acceptor;

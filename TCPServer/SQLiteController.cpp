@@ -622,7 +622,7 @@ bool SqliteController::queryFriendList(const string& userID, vector<pair<string,
 	return true;
 }
 
-bool SqliteController::queryGroupList(const string& userID, vector<pair<string, string>>& result)
+bool SqliteController::queryGroupList(const string& userID, vector<pair<int, string>>& result)
 {
 	int rc = SQLITE_ERROR;
 	sqlite3_stmt* stmt;
@@ -642,11 +642,11 @@ bool SqliteController::queryGroupList(const string& userID, vector<pair<string, 
 	unique_lock<mutex> lock(m_mutex);	//lock
 	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
 		//user exist
-		string groupID = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+		int groupID = (sqlite3_column_int(stmt, 0));
 		string groupName;
 
 		lock.unlock();
-		queryUserName(groupID, groupName);
+		queryGroupName(groupID, groupName);
 		lock.lock();
 
 		result.push_back(pair(groupID, groupName));

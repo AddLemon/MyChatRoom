@@ -41,12 +41,18 @@ public:
 		:Command(requestID, senderID), m_id(id), m_password(password) 
 	{
 		m_reply_type = ServerMsgType::SERVER_REPLY_LOG_IN;
+		m_notice_type = ServerMsgType::SERVER_NOTICE_RENEW_STATUS;
 	};
 
 	void execute() override;
+	void send() override;
+	void addHeader() override;
 private:
 	string m_id;
 	string m_password;
+	ServerMsgType m_notice_type;
+	Json::Value m_notice_pkt;
+	queue<string> onlineFriends;
 };
 
 class MdfyUsrInfoCommand : public Command
@@ -243,4 +249,22 @@ private:
 	string m_timestamp;
 	ServerMsgType m_forward_type;
 	Json::Value m_forward_pkt;
+};
+
+class LogOffCommand : public Command
+{
+public:
+	LogOffCommand(int requestID, string senderID)
+		:Command(requestID, senderID)
+	{
+		m_notice_type = ServerMsgType::SERVER_NOTICE_RENEW_STATUS;
+	};
+
+	void execute() override;
+	void send() override;
+	void addHeader() override;
+private:
+	ServerMsgType m_notice_type;
+	Json::Value m_notice_pkt;
+	queue<string> onlineFriends;
 };

@@ -45,8 +45,39 @@ void RegisterCommand::execute()
 
 void LogInCommand::execute()
 {
-    Json::Value msg = m_server->dealLogin(m_senderID, m_id, m_password);
+    Json::Value notice_msg;
+    Json::Value msg = m_server->dealLogin(m_senderID, m_id, m_password, notice_msg, onlineFriends);
     m_reply_pkt["message"] = msg;
+    m_notice_pkt["message"] = notice_msg;
+}
+
+void LogInCommand::send()
+{
+    addHeader();
+    addCheckSum(m_reply_pkt);
+    addCheckSum(m_notice_pkt);
+    m_server->send(m_senderID, m_reply_pkt);
+
+    while (onlineFriends.size() != 0) {
+        string id = onlineFriends.front();
+        onlineFriends.pop();
+        if (m_senderID != id) {
+            m_server->send(id, m_notice_pkt);
+        }
+    }
+}
+
+void LogInCommand::addHeader()
+{
+    Json::Value reply_header;
+    reply_header["requestID"] = m_requestID;
+    reply_header["type"] = static_cast<int>(m_reply_type);
+    m_reply_pkt["header"] = reply_header;
+
+    Json::Value notice_header;
+    notice_header["type"] = static_cast<int>(m_notice_type);
+    notice_header["senderID"] = m_senderID;
+    m_notice_pkt["header"] = notice_header;
 }
 
 void MdfyUsrInfoCommand::execute()
@@ -159,6 +190,9 @@ void GpChatCommand::execute()
 {
     Json::Value msg = m_server->dealGroupChat(m_senderID, m_groupID, m_content, m_timestamp, m_online_members);
     m_forward_pkt["message"] = msg;
+    Json::Value reply;
+    reply["status"] = true;
+    m_reply_pkt["message"] = reply;
 }
 
 void GpChatCommand::send()
@@ -194,6 +228,9 @@ void PvChatCommand::execute()
 {
     Json::Value msg = m_server->dealPrivateChat(m_senderID, m_receiverID, m_content, m_timestamp, isOL);
     m_forward_pkt["message"] = msg;
+    Json::Value reply;
+    reply["status"] = true;
+    m_reply_pkt["message"] = reply;
 }
 
 void PvChatCommand::send()
@@ -218,4 +255,33 @@ void PvChatCommand::addHeader()
     forward_header["type"] = static_cast<int>(m_forward_type);
     forward_header["senderID"] = m_senderID;
     m_forward_pkt["header"] = forward_header;
+}
+
+void LogOffCommand::execute()
+{
+    Json::Value notice_msg;
+    m_server->dealLogOff(m_senderID, notice_msg, onlineFriends);
+    m_notice_pkt["message"] = notice_msg;
+}
+
+void LogOffCommand::send()
+{
+    addHeader();
+    addCheckSum(m_notice_pkt);
+
+    while (onlineFriends.size() != 0) {
+        string id = onlineFriends.front();
+        onlineFriends.pop();
+        if (m_senderID != id) {
+            m_server->send(id, m_notice_pkt);
+        }
+    }
+}
+
+void LogOffCommand::addHeader()
+{
+    Json::Value notice_header;
+    notice_header["type"] = static_cast<int>(m_notice_type);
+    notice_header["senderID"] = m_senderID;
+    m_notice_pkt["header"] = notice_header;
 }

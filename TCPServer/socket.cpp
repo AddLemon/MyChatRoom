@@ -17,14 +17,12 @@ tcp::socket* Socket::get()
 	return m_socket;
 }
 
-int Socket::read(string& pkt)
+int Socket::read(vector<unsigned char>& pkt)
 {
 	//receive data and resize the buffer
-	vector<char> buffer(1024);
+	vector<unsigned char> buffer(1024);
 	size_t size;
 	system::error_code error;
-
-	cout << "start to receive..." << endl;	//test ***********************
 	
 	size = m_socket->read_some(asio::buffer(buffer), error);	//∂¡»°
 	if (error == asio::error::eof) {
@@ -37,21 +35,18 @@ int Socket::read(string& pkt)
 		return 0;
 	}
 
-	pkt = string(buffer.begin(), buffer.begin() + size);
-
+	buffer.resize(size);
+	pkt = buffer;
 	return 1;
 }
 
-void Socket::write(string pkt)
+void Socket::write(vector<unsigned char>& pkt)
 {
 	//lock
 	unique_lock<mutex> lock(m_mutex);
-	cout << "send string:" << endl << pkt << endl;	//test ********************
 	//send packet
 	system::error_code error;
-	//asio::write(m_socket, asio::buffer(pkt), error);
 	size_t size = m_socket->send(asio::buffer(pkt), 0, error);
-	cout << "send size: " << size << endl;
 	if (error) {
 		cout << "Send error: " << error << " - " << error.message() << endl;
 	}

@@ -73,7 +73,7 @@ public:
 	bool queryUserName(const string& userID, string& result);	//读取用户名称
 	bool queryUserPassword(const string& userID, string& result); //读取用户密码
 	bool queryFriendList(const string& userID, vector<pair<string,string>>& result);	//读取好友列表
-	bool queryGroupList(const string& userID, vector<pair<string,string>>& result);	//读取群聊列表			//new
+	bool queryGroupList(const string& userID, vector<pair<int,string>>& result);	//读取群聊列表			//new
 
 	bool isGroupID(const int& groupID);		////查询是否存在此group id			//new
 	bool queryGroupName(const int& groupID, string& result);	//读取群组名称			//new
@@ -108,5 +108,5 @@ private:
 private:
 	sqlite3* m_db;
 	mutex m_mutex;
-	const char* m_path = "D:\\MyWork_CPP\\MyChatRoom\\data\\MyChatRoom.db";//"MyChatRoom.db";
+	const char* m_path = "MyChatRoom.db";//"D:\\MyWork_CPP\\MyChatRoom\\data\\MyChatRoom.db";
 };

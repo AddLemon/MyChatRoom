@@ -1,1 +1,0 @@
-D:\MyWork_CPP\MyChatRoom\TCPClient\x64\Debug\TCPClient.vcxproj.CopyComplete
