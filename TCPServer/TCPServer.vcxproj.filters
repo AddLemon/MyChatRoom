@@ -33,9 +33,6 @@
     <ClCompile Include="ThreadPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="sqlite3.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="commands.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -63,9 +60,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SQLiteController.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="sqlite3.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="commands.h">
