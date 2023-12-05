@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>250</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QToolBox" name="toolBox">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="friendsPage">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>250</width>
+         <height>481</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Friends</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="friendLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QListView" name="fdListView"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="groupsPage">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>250</width>
+         <height>481</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Groups</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="groupLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QListView" name="gpListView"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>250</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuadd">
+    <property name="title">
+     <string>communication</string>
+    </property>
+    <property name="icon">
+     <iconset resource="res.qrc">
+      <normaloff>:/res/add-user.png</normaloff>:/res/add-user.png</iconset>
+    </property>
+    <addaction name="actionadd_friend_group"/>
+    <addaction name="actioncreate_group"/>
+   </widget>
+   <widget class="QMenu" name="menusettings">
+    <property name="title">
+     <string>settings</string>
+    </property>
+    <property name="icon">
+     <iconset resource="res.qrc">
+      <normaloff>:/res/setting-two.png</normaloff>:/res/setting-two.png</iconset>
+    </property>
+    <addaction name="actionprofile"/>
+   </widget>
+   <widget class="QMenu" name="menuLog_out">
+    <property name="title">
+     <string>Log out</string>
+    </property>
+    <property name="icon">
+     <iconset resource="res.qrc">
+      <normaloff>:/res/logout.png</normaloff>:/res/logout.png</iconset>
+    </property>
+    <addaction name="action_Logout"/>
+   </widget>
+   <addaction name="menuadd"/>
+   <addaction name="menusettings"/>
+   <addaction name="menuLog_out"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionadd_friend_group">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/res/people-plus-one.png</normaloff>:/res/people-plus-one.png</iconset>
+   </property>
+   <property name="text">
+    <string>add friend/group</string>
+   </property>
+   <property name="toolTip">
+    <string>add friend/group</string>
+   </property>
+  </action>
+  <action name="actioncreate_group">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/res/list-add.png</normaloff>:/res/list-add.png</iconset>
+   </property>
+   <property name="text">
+    <string>create_group</string>
+   </property>
+   <property name="toolTip">
+    <string>create group</string>
+   </property>
+  </action>
+  <action name="actionprofile">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/res/me.png</normaloff>:/res/me.png</iconset>
+   </property>
+   <property name="text">
+    <string>profile</string>
+   </property>
+   <property name="toolTip">
+    <string>modify profile</string>
+   </property>
+  </action>
+  <action name="action_Logout">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/res/logout.png</normaloff>:/res/logout.png</iconset>
+   </property>
+   <property name="text">
+    <string>Log out</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
+ <connections/>
+</ui>
